@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción de Crecimiento del Ganado</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-5">Predicción de Crecimiento del Ganado</h1>
+        <form method="POST" action="{% url 'predict_growth' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="birth_date">Fecha de Nacimiento:</label>
+                <input type="date" class="form-control" value="{% now 'Y-m-d' %}" id="birth_date" name="birth_date" required>
+            </div>
+           <div class="form-group">
+                <label for="breed">Raza:</label>
+                <select class="form-control" id="breed" name="breed" required>
+                    <option value="" disabled selected>Seleccione una raza</option>
+                    {% for raza in razas %}
+                        <option value="{{ raza }}">{{ raza }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="pasture_zone">Zona de Pastoreo:</label>
+                <input type="text" class="form-control" value="Norte" id="pasture_zone" name="pasture_zone" required>
+            </div>
+            <div class="form-group">
+                <label for="health_status">Estado de Salud:</label>
+                <input type="text" class="form-control" value="Bueno" id="health_status" name="health_status" required>
+            </div>
+            <div class="form-group">
+                <label for="date">Fecha:</label>
+                <input type="date" class="form-control" id="date" value="{% now 'Y-m-d' %}"  name="date" required>
+            </div>
+            <div class="form-group">
+                <label for="weight">Peso (kg):</label>
+                <input type="number" class="form-control" id="weight" name="weight">
+            </div>
+            <button type="submit" class="btn btn-primary">Predecir Crecimiento</button>
+        </form>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
