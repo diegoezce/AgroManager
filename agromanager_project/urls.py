@@ -16,10 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from ganaderia.views import input_growth_data, predict_growth
+from ganaderia.views import input_growth_data, predict_growth, main_view, mapeo, cargar_geojson_view
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('predict/', predict_growth, name='predict_growth'),
     path('input/', input_growth_data, name='input_growth_data'),
+    path('main/', main_view, name='main'),
+    path('settings/', main_view, name='settings'),
+    path('mapeo/', mapeo, name='mapeo'),
+    path('help/', main_view, name='help'),
+    path('cargar_geojson_view/', cargar_geojson_view, name='cargar_geojson'),
 ]

@@ -1,12 +1,19 @@
 from django.db import models
-
-from django.db import models
 from django.utils import timezone
+
+
+class Breed(models.Model):
+    name = models.CharField(max_length=100, unique=True)  # Nombre de la raza, único
+    description = models.TextField(blank=True, null=True)  # Descripción opcional de la raza
+
+    def __str__(self):
+        return self.name
+
 
 class Animal(models.Model):
     identifier = models.CharField(max_length=50, unique=True)  # Ej: código de identificación único
     species = models.CharField(max_length=100)                 # Especie (vaca, toro, etc.)
-    breed = models.CharField(max_length=100)                   # Raza
+    breed = models.ForeignKey(Breed, on_delete=models.SET_NULL, null=True)  # Relación a Breed
     birth_date = models.DateField()                            # Fecha de nacimiento
     weight = models.FloatField()                               # Peso en kg
     health_status = models.CharField(max_length=100)           # Estado de salud (Ej: "Saludable", "Enfermo")
@@ -71,3 +78,11 @@ class WeatherRecord(models.Model):
 
     def __str__(self):
         return f"{self.pasture_zone.name} - Clima en {self.date}"
+
+
+class Campo(models.Model):
+    name = models.CharField(max_length=200)
+    geometria = models.TextField()  # Almacena la geometría como texto (WKT o GeoJSON)
+
+    def __str__(self):
+        return self.name

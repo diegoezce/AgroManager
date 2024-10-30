@@ -1,0 +1,220 @@
+/* Estilos generales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f5f7fa;
+    color: #333;
+}
+
+header {
+    background-color: #35424a;
+    padding: 20px;
+    color: #ffffff;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2rem;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+nav ul li a {
+    color: #ffffff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+nav ul li a:hover {
+    color: #d1d1d1;
+}
+
+/* Contenedor principal */
+.panel-container {
+    display: flex;
+    gap: 20px;
+    max-width: 1000px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* Panel de administración de animales */
+#animals-panel {
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #ffffff;
+}
+
+/* Botón de mostrar formulario */
+#show-form-button {
+    padding: 10px 15px;
+    font-size: 1rem;
+    background-color: #35424a;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-bottom: 20px;
+}
+
+#show-form-button:hover {
+    background-color: #2a373e;
+}
+
+/* Lista de animales */
+#animal-list {
+    list-style-type: none;
+    padding: 0;
+    font-size: 0.95rem;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#animal-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Formulario de animales */
+#animal-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 350px;
+    margin: 0 auto;
+    font-size: 0.85rem;
+}
+
+#animal-form label {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+#animal-form input[type="text"],
+#animal-form input[type="number"],
+#animal-form input[type="date"],
+#animal-form input[type="checkbox"] {
+    padding: 8px;
+    font-size: 0.85rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    color: #333;
+}
+
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+#animal-form input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+/* Grupo de botones */
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.button-group button {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    background-color: #35424a;
+    color: #ffffff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.button-group button:hover {
+    background-color: #2a373e;
+}
+
+/* Panel del dashboard */
+#dashboard-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.dashboard-section {
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 4px;
+    border-left: 4px solid #a3b1c2;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
+    text-align: center;
+}
+
+.dashboard-section h3 {
+    color: #35424a;
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.dashboard-section p {
+    color: #666;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    color: #888;
+    font-size: 0.9rem;
+}
+
+/* Estilos específicos para la grilla de animales */
+.animal-grid {
+    font-size: 0.85rem;
+}
+
+.animal-grid thead th {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.animal-grid td, .animal-grid th {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+.animal-grid tbody tr:hover {
+    background-color: #f2f2f2;
+}
+
+/* Botones en la grilla de animales */
+.animal-grid td button {
+    font-size: 0.75rem;      /* Tamaño de fuente reducido */
+    padding: 2px 4px;        /* Padding más pequeño */
+    margin: 0;               /* Sin margen para ahorrar espacio */
+    color: #ffffff;
+    background-color: #35424a;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.animal-grid td button:hover {
+    background-color: #2a373e; /* Color de fondo al pasar el cursor */
+}
