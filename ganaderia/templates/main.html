@@ -1,150 +1,18 @@
-
-<!DOCTYPE html>{% load static %}
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AgroGestión</title>
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-</head>
-<body>
-    <header>
-        <h1>AgroGestión</h1>
-        <nav>
-            <ul>
-                <li><a href="{% url 'main' %}">Inicio</a></li>
-                <li><a href="{% url 'settings' %}">Configuración</a></li>
-                <li><a href="{% url 'mapeo' %}">Mapeo</a></li>
-                <li><a href="{% url 'help' %}">Ayuda</a></li>
-            </ul>
-        </nav>
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css">
-        <script>
-          // Función para mostrar/ocultar el formulario de agregar animal
-          function toggleForm() {
-              const form = document.getElementById("animal-form");
-              const button = document.getElementById("show-form-button");
-
-              if (form.style.display === "none") {
-                  form.style.display = "block";
-                  button.style.display = "none";
-              } else {
-                  form.style.display = "none";
-                  button.style.display = "block";
-              }
-          }
-        </script>
-    </header>
-
-    <main>
-        <div class="panel-container">
-            <!-- Panel de Administración de Animales -->
-            <section class="panel" id="animals-panel">
-
-                  <h2>Administración de Animales</h2>
-
-                  <!-- Botón para Agregar Animal -->
-                  <button id="show-form-button" onclick="toggleForm()">Agregar Animal</button>
-
-                  <!-- Lista de Animales -->
-
-                  <div class="container mt-4">
-                      <h2 class="text-center mb-4">Lista de Animales</h2>
-                      <div class="table-responsive">
-                          <table class="table table-striped table-hover align-middle animal-grid">
-                              <thead class="table-dark">
-                                  <tr>
-                                      <th>ID</th>
-                                      <th>Especie</th>
-                                      <th>Raza</th>
-                                      <th>Fecha de Nacimiento</th>
-                                      <th>Peso (kg)</th>
-                                      <th>Estado de Salud</th>
-                                      <th>Zona de Pastoreo</th>
-                                      <th>Para la Venta</th>
-                                      <th>Acciones</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <!-- Ejemplo de fila de animal -->
-                                  {% for animal in animals_list%}
-                                    <tr>
-                                        <td>{{animal.identifier}}</td>
-                                        <td>{{animal.species}}</td>
-                                        <td>{{animal.breed}}</td>
-                                        <td>{{animal.birth_date}}</td>
-                                        <td>{{animal.weight}}</td>
-                                        <td>{{animal.health_status}}</td>
-                                        <td>{{animal.pasture_zone}}</td>
-                                        <td>{{animal.is_for_sale}}</td>
-                                        <td>
-                                            <button class="btn btn-primary btn-sm">Modificar</button>
-                                            <button class="btn btn-danger btn-sm">Eliminar</button>
-                                        </td>
-                                    </tr>
-                                  {% endfor %}
-                                  <!-- Agrega más filas dinámicamente aquí -->
-                              </tbody>
-
-                          </table>
-                      </div>
-                  </div>
+{% extends "base.html" %}
 
 
-                  <!-- Formulario de Agregar/Modificar Animal (oculto inicialmente) -->
-                  <form id="animal-form" style="display: none;">
-                      <div class="form-group">
-                          <label for="identifier">ID del Animal:</label>
-                          <input type="text" id="identifier" name="identifier" placeholder="Código único" required>
-                      </div>
+{% block title %}
+Inicio
+{% endblock %}
 
-                      <div class="form-group">
-                          <label for="species">Especie:</label>
-                          <input type="text" id="species" name="species" placeholder="Ej: Vaca" required>
-                      </div>
 
-                      <div class="form-group">
-                          <label for="breed">Raza:</label>
-                          <input type="text" id="breed" name="breed" placeholder="Ej: Hereford" required>
-                      </div>
+{% block extra_head %}
 
-                      <div class="form-group">
-                          <label for="birth-date">Fecha de Nacimiento:</label>
-                          <input type="date" id="birth-date" name="birth_date" required>
-                      </div>
+{% endblock %}
 
-                      <div class="form-group">
-                          <label for="weight">Peso (kg):</label>
-                          <input type="number" id="weight" name="weight" placeholder="Ej: 350" step="0.01" required>
-                      </div>
 
-                      <div class="form-group">
-                          <label for="health-status">Estado de Salud:</label>
-                          <input type="text" id="health-status" name="health_status" placeholder="Ej: Saludable" required>
-                      </div>
-
-                      <div class="form-group">
-                          <label for="pasture-zone">Zona de Pastoreo:</label>
-                          <input type="text" id="pasture-zone" name="pasture_zone" placeholder="Ej: Zona A">
-                      </div>
-
-                      <div class="form-group checkbox-group">
-                          <label for="is-for-sale">Listo para la Venta:</label>
-                          <input type="checkbox" id="is-for-sale" name="is_for_sale">
-                      </div>
-
-                      <!-- Botones de acción -->
-                      <div class="button-group">
-                          <button type="submit" id="add-animal">Agregar</button>
-                          <button type="button" id="update-animal">Modificar</button>
-                          <button type="button" id="delete-animal">Borrar</button>
-                          <button type="button" onclick="toggleForm()">Cancelar</button>
-                      </div>
-                  </form>
-
-            </section>
-
-            <!-- Panel de Dashboard -->
+{% block content %}
+   <!-- Panel de Dashboard -->
             <section class="dashboard" id="dashboard-panel">
                 <div class="dashboard-section">
                     <h3>Sección 1</h3>
@@ -159,11 +27,4 @@
                     <p>Espacio para métricas clave o gráficos.</p>
                 </div>
             </section>
-        </div>
-    </main>
-
-    <footer>
-        <p>&copy; 2024 AgroGestión. Todos los derechos reservados.</p>
-    </footer>
-</body>
-</html>
+{% endblock %}

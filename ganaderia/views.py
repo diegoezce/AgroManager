@@ -6,7 +6,7 @@ import pandas as pd
 from django.views.decorators.csrf import csrf_exempt
 
 from . import utils
-from .models import Animal
+from .models import Animal, Breed, PastureZone
 from django.http import JsonResponse
 
 from .utils import cargar_datos_geoespaciales
@@ -53,15 +53,16 @@ def input_growth_data(request):
     return render(request, 'prediction_input.html', {'razas': razas})
 
 def main_view(request):
-    animals_list = Animal.objects.all()
 
-    return render(request, 'main.html', {'animals_list': animals_list})
+    return render(request, 'main.html')
+
+def admin_animales(request):
+    animals_list = Animal.objects.all()
+    return render(request, 'admin_animales.html', {'animals_list': animals_list})
 
 
 def mapeo(request):
-
     return render(request, 'mapeo.html')
-
 
 
 def cargar_geojson_view(request):
@@ -84,3 +85,57 @@ def cargar_geojson_view(request):
 
     # Si no es una solicitud POST, simplemente renderiza el formulario
     return render(request, 'cargar_geojson.html')
+
+
+def create_animal(request):
+    if request.method == 'POST':
+        # Suponiendo que 'animal' es el objeto al que quieres asignar los valores.
+        try:
+            animal = Animal()
+            animal.identifier = request.POST.get('identifier')
+            animal.species = request.POST.get('species')
+
+            breed_name = request.POST.get('breed')
+            breed, created = Breed.objects.get_or_create(name=breed_name)
+
+            pasture_name = request.POST.get('pasture_zone')
+            pasture, pasture_created = PastureZone.objects.get_or_create(name=pasture_name)
+
+            if request.POST.get('is_for_sale') == '':
+                sale = False
+            else:
+                sale = True
+
+            animal.breed = breed
+            animal.birth_date = request.POST.get('birth_date')
+            animal.weight = request.POST.get('weight')
+            animal.health_status = request.POST.get('health_status')
+            animal.pasture_zone = pasture
+            animal.is_for_sale = sale
+            animal.save()
+            return JsonResponse({'success': True, 'message': 'Datos guardados exitosamente.'})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': 'Error al guardar los datos.', 'error': str(e)})
+
+
+def update_animal(request, animal_id):
+    if request.method == 'POST':
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+
+        try:
+            animal = Animal.objects.get(id=animal_id)
+            # Convierte el valor a booleano si es para el campo `is_for_sale`
+            if field == 'is_for_sale':
+                setattr(animal, field, value == 'True')
+            else:
+                setattr(animal, field, value)
+            animal.save()
+            return JsonResponse({'status': 'success'})
+        except Animal.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Animal no encontrado'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+

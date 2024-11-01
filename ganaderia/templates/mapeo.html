@@ -1,18 +1,18 @@
-<!DOCTYPE html>{% load static %}
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crea el mapa de tu campo</title>
+{% extends "base.html" %}
+
+{% block title %}Crea el mapa de tu campo | Mi Aplicación
+{% endblock %}
+
+{% block extra_head %}
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
-       <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <style>
-        #map { height: 650px; width: 100%; }
+        #map { height: 580px; width: 100%; }
     </style>
-</head>
-<body>
-    <h1>Crea el mapa de tu campo</h1>
+{% endblock %}
+
+
+{% block content %}
     <div id="map"></div>
     <!-- templates/cargar_geojson.html -->
     <form action="{% url 'cargar_geojson' %}" method="post" enctype="multipart/form-data" id="geojsonForm">
@@ -73,5 +73,6 @@
     });
 
     </script>
-</body>
-</html>
+{% endblock %}
+
+

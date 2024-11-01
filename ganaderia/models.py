@@ -28,8 +28,8 @@ class Animal(models.Model):
 # Create your models here.
 class PastureZone(models.Model):
     name = models.CharField(max_length=100)                   # Nombre de la zona
-    area_size = models.FloatField()                           # Tamaño en hectáreas
-    grazing_capacity = models.IntegerField()                  # Capacidad de pastoreo en número de animales
+    area_size = models.FloatField(default=0)                           # Tamaño en hectáreas
+    grazing_capacity = models.IntegerField(default=0)                  # Capacidad de pastoreo en número de animales
     current_animals = models.ManyToManyField(Animal, blank=True, related_name='zones')  # Animales actualmente en la zona
     is_active = models.BooleanField(default=True)             # Zona activa o en descanso
 

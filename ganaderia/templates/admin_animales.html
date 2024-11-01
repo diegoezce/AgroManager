@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio | Mi Aplicación{% endblock %}
+
+{% block extra_head %}
+
+        <script>
+          // Función para mostrar/ocultar el formulario de agregar animal
+          function toggleForm() {
+              const form = document.getElementById("animal-form");
+              const button = document.getElementById("show-form-button");
+              const lista = document.getElementById("list-animales");
+
+              if (form.style.display === "none") {
+                  form.style.display = "block";
+                  button.style.display = "none";
+                  lista.style.display = "none"
+
+              } else {
+                    if (form.style.display === "block") {
+                        form.style.display = "none";
+                        button.style.display = "block";
+                        lista.style.display = "block"
+                        }
+              }
+          }
+
+
+
+
+
+        </script>
+
+    <style>
+          .form-control-sm {
+            padding: 0.2rem;
+            height: 1.5rem;
+            font-size: 0.875rem;
+        }
+
+        .editable {
+            cursor: pointer; /* Cambia el cursor para indicar que es editable */
+            border-bottom: 1px dotted #007bff; /* Agrega un subrayado punteado */
+            color: #007bff; /* Cambia el color del texto */
+        }
+
+        .editable:hover {
+            background-color: #f1f1f1; /* Cambia el color de fondo al pasar el ratón */
+            color: #0056b3; /* Cambia el color del texto al pasar el ratón */
+        }
+
+         .editable i {
+            font-size: 0.75rem;
+            color: #007bff;
+            margin-left: 4px;
+            opacity: 0.7;
+        }
+
+        .editable:hover i {
+            opacity: 1; /* Aumenta la opacidad al pasar el ratón */
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="panel-container">
+            <!-- Panel de Administración de Animales -->
+            <section class="panel" id="animals-panel">
+
+                  <h2>Administración de Animales</h2>
+
+                  <!-- Botón para Agregar Animal -->
+                  <button id="show-form-button" onclick="toggleForm()" class="add-animal-btn">Agregar Animal</button>
+
+                  <!-- Lista de Animales -->
+                  <div id="list-animales">
+                      <div class="container mt-4">
+                          <div class="table-responsive">
+                              <table class="table table-striped table-hover align-middle animal-grid">
+                                  <thead class="table-dark">
+                                      <tr>
+                                          <th>ID</th>
+                                          <th>Especie</th>
+                                          <th>Raza</th>
+                                          <th>Fecha de Nacimiento</th>
+                                          <th>Peso (kg)</th>
+                                          <th>Estado de Salud</th>
+                                          <th>Zona de Pastoreo</th>
+                                          <th>Para la Venta</th>
+                                          <th>Acciones</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <!-- Ejemplo de fila de animal -->
+                                      {% for animal in animals_list%}
+                                        <tr data-animal-id="{{ animal.id }}">
+                                            <td class="editable" data-field="identifier">{{ animal.identifier }} </td>
+                                            <td data-field="species">{{ animal.species }}</td>
+                                            <td data-field="breed">{{ animal.breed }}</td>
+                                            <td data-field="birth_date">{{ animal.birth_date }}</td>
+                                            <td class="editable" data-field="weight">{{ animal.weight }}</td>
+                                            <td class="editable" data-field="health_status">{{ animal.health_status }}</td>
+                                            <td data-field="pasture_zone">{{ animal.pasture_zone }}</td>
+                                            <td class="editable" data-field="is_for_sale" data-animal-id="{{ animal.id }}">
+                                                <input type="checkbox" class="sale-checkbox" {% if animal.is_for_sale %}checked{% endif %}>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm" >Eliminar</button>
+                                            </td>
+                                        </tr>
+                                      {% endfor %}
+                                      <!-- Agrega más filas dinámicamente aquí -->
+                                  </tbody>
+
+                              </table>
+                          </div>
+                      </div>
+                  </div>
+
+
+                  <!-- Formulario de Agregar/Modificar Animal (oculto inicialmente) -->
+                 <form action="{% url 'create_animal' %}" method="post" enctype="multipart/form-data" id="animal-form" style="display: none; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+                     {% csrf_token %}
+
+                     <!-- ID del Animal -->
+                      <div class="form-group mb-3">
+                          <label class="form-label" for="identifier">ID del Animal:</label>
+                          <input type="text" id="identifier" name="identifier" class="form-control" placeholder="Código único" required>
+                      </div>
+
+                      <!-- Especie -->
+                      <div class="form-group mb-3">
+                          <label for="species" class="form-label">Especie:</label>
+                          <input type="text" id="species" name="species" class="form-control" placeholder="Ej: Vaca" required>
+                      </div>
+
+                      <!-- Raza -->
+                      <div class="form-group mb-3">
+                          <label for="breed" class="form-label">Raza:</label>
+                          <input type="text" id="breed" name="breed" class="form-control" placeholder="Ej: Hereford" required>
+                      </div>
+
+                      <!-- Fecha de Nacimiento -->
+                      <div class="form-group mb-3">
+                          <label for="birth-date" class="form-label">Fecha de Nacimiento:</label>
+                          <input type="date" id="birth-date" name="birth_date" class="form-control" required>
+                      </div>
+
+                      <!-- Peso (kg) -->
+                      <div class="form-group mb-3">
+                          <label for="weight" class="form-label">Peso (kg):</label>
+                          <input type="number" id="weight" name="weight" class="form-control" placeholder="Ej: 350" step="0.01" required>
+                      </div>
+
+                      <!-- Estado de Salud -->
+                      <div class="form-group mb-3">
+                          <label for="health-status" class="form-label">Estado de Salud:</label>
+                          <input type="text" id="health-status" name="health_status" class="form-control" placeholder="Ej: Saludable" required>
+                      </div>
+
+                      <!-- Zona de Pastoreo -->
+                      <div class="form-group mb-3">
+                          <label for="pasture-zone" class="form-label">Zona de Pastoreo:</label>
+                          <input type="text" id="pasture-zone" name="pasture_zone" class="form-control" placeholder="Ej: Zona A">
+                      </div>
+
+                      <!-- Listo para la Venta (Checkbox) -->
+                      <div class="form-group form-check mb-4">
+                          <input type="checkbox" id="is-for-sale" name="is_for_sale" class="form-check-input">
+                          <label for="is-for-sale" class="form-check-label">Listo para la Venta</label>
+                      </div>
+
+                      <!-- Botones de Acción -->
+                      <div class="d-flex justify-content-between">
+                          <button type="submit" id="add-animal" class="btn btn-primary">Agregar</button>
+                          <button type="button" id="update-animal" class="btn btn-secondary">Modificar</button>
+                          <button type="button" onclick="toggleForm()" class="btn btn-outline-danger">Cancelar</button>
+                      </div>
+                    </form>
+
+            </section>
+
+
+        </div>
+
+
+    <script>
+
+
+
+<!--    GUARDAR EN LA VISTA LOS CAMBIOS HECHOS EN LA GRILLA-->
+      $(document).ready(function() {
+            $('.editable').on('click', function() {
+                const cell = $(this);
+                const field = cell.data('field');
+                const currentValue = cell.text().trim();
+                const animalId = cell.closest('tr').data('animal-id');
+
+                // Revisar si ya está en modo edición
+                if (cell.find('input').length > 0) return;
+
+                // Crear el campo de entrada dentro de la celda sin borrar el contenido
+                const input = $('<input>', {
+                    type: 'text',
+                    value: currentValue,
+                    class: 'form-control form-control-sm',
+                    css: {
+                        width: '100%',
+                        border: 'none',
+                        padding: '0',
+                        margin: '0'
+                    },
+                    blur: function() {
+                        const newValue = input.val().trim();
+
+                        // Verificar si el valor ha cambiado
+                        if (newValue && newValue !== currentValue) {
+                            // Realizar la solicitud AJAX solo si hay un cambio real
+                            $.ajax({
+                                url: `../update_animal/${animalId}/`,
+                                type: 'POST',
+                                data: {
+                                    id: animalId,
+                                    field: field,
+                                    value: newValue,
+                                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                                },
+                                success: function(response) {
+                                    console.log('Respuesta exitosa:', response); // Debug
+                                    cell.text(newValue);  // Actualiza la celda con el nuevo valor
+                                },
+                                error: function(xhr) {
+                                    console.log('Error en la solicitud AJAX:', xhr); // Debug
+                                    alert('Error al actualizar: ' + xhr.responseText);
+                                    cell.text(currentValue); // Restaura el valor original si falla
+                                }
+                            });
+                        } else {
+                            // Restaurar el valor original si no hay cambios
+                            cell.text(currentValue);
+                        }
+                    },
+                    keyup: function(e) {
+                        if (e.which === 13) { // Cuando se presiona Enter
+                            input.blur(); // Dispara el evento blur para guardar
+                        }
+                    }
+                });
+
+                // Mantener el valor actual visible y agregar el input al final
+                cell.empty().append(input);
+                input.focus().val(currentValue); // Pone el foco y mantiene el valor en el campo de entrada
+
+                // Cerrar la edición si se hace clic fuera del input
+                $(document).on('click', function(e) {
+                    if (!$(e.target).closest('.editable').length) {
+                        input.blur();
+                    }
+                });
+            });
+        });
+
+
+        $(document).ready(function() {
+            $('.sale-checkbox').on('change', function() {
+                const checkbox = $(this);
+                const cell = checkbox.closest('.editable');
+                const animalId = cell.data('animal-id');
+                const isForSale = checkbox.is(':checked');  // Obtener el estado del checkbox
+
+                // Realizar la solicitud AJAX para actualizar el valor
+                $.ajax({
+                    url: `../update_animal/${animalId}/`,
+                    type: 'POST',
+                    data: {
+                        id: animalId,
+                        field: 'is_for_sale',
+                        value: isForSale ? 'True' : 'False',  // Convertir el booleano a cadena
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(response) {
+                        console.log('Actualización exitosa:', response);
+                    },
+                    error: function(xhr) {
+                        alert('Error al actualizar: ' + xhr.responseText);
+                        // Revertir el cambio en caso de error
+                        checkbox.prop('checked', !isForSale);
+                    }
+                });
+            });
+        });
+
+
+    </script>
+
+{% endblock %}
+
