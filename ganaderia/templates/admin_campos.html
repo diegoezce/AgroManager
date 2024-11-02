@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Inicio | Mi Aplicación
+
+{% endblock %}
+
+
+
+{% block extra_head %}
+
+{% endblock %}
+
+
+
+{% block content %}
+      <div class="panel-container">
+            <!-- Panel de Administración de Animales -->
+            <section class="panel" id="animals-panel">
+
+                  <h2>Administración de Campos</h2>
+
+                  <!-- Lista de Animales -->
+                  <div id="list-animales">
+                      <div class="container mt-4">
+                          <div class="table-responsive">
+                              <table class="table table-striped table-hover align-middle animal-grid" id="animalTable">
+                                  <thead class="table-dark">
+                                      <tr>
+                                          <th>Nombre</th>
+                                          <th>Coordenadas</th>
+                                          <th>Acciones</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <!-- Ejemplo de fila de campo -->
+                                      {% for campo in campos_list%}
+                                        <tr data-campo-id="{{ campo.id }}">
+                                            <td class="editable" data-field="name">{{ campo.name }} </td>
+                                            <td data-field="geometria">{{ campo.geometria }} </td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ campo.id }})" >Eliminar</button>
+                                            </td>
+                                        </tr>
+                                      {% endfor %}
+                                      <!-- Agrega más filas dinámicamente aquí -->
+                                  </tbody>
+
+                              </table>
+                          </div>
+                      </div>
+                  </div>
+            </section>
+      </div>
+
+
+     {% if messages %}
+        {% for message in messages %}
+            <div class="popup-message {{ message.tags }}">
+                <button class="close-btn" onclick="closePopup(this)">×</button>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+{% endblock %}

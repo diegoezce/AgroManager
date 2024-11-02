@@ -29,6 +29,8 @@
 
 
 
+
+
         </script>
 
     <style>
@@ -38,27 +40,7 @@
             font-size: 0.875rem;
         }
 
-        .editable {
-            cursor: pointer; /* Cambia el cursor para indicar que es editable */
-            border-bottom: 1px dotted #007bff; /* Agrega un subrayado punteado */
-            color: #007bff; /* Cambia el color del texto */
-        }
 
-        .editable:hover {
-            background-color: #f1f1f1; /* Cambia el color de fondo al pasar el ratón */
-            color: #0056b3; /* Cambia el color del texto al pasar el ratón */
-        }
-
-         .editable i {
-            font-size: 0.75rem;
-            color: #007bff;
-            margin-left: 4px;
-            opacity: 0.7;
-        }
-
-        .editable:hover i {
-            opacity: 1; /* Aumenta la opacidad al pasar el ratón */
-        }
     </style>
 {% endblock %}
 
@@ -76,7 +58,7 @@
                   <div id="list-animales">
                       <div class="container mt-4">
                           <div class="table-responsive">
-                              <table class="table table-striped table-hover align-middle animal-grid">
+                              <table class="table table-striped table-hover align-middle animal-grid" id="animalTable">
                                   <thead class="table-dark">
                                       <tr>
                                           <th>ID</th>
@@ -105,7 +87,7 @@
                                                 <input type="checkbox" class="sale-checkbox" {% if animal.is_for_sale %}checked{% endif %}>
                                             </td>
                                             <td>
-                                                <button class="btn btn-danger btn-sm" >Eliminar</button>
+                                                <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ animal.id }})" >Eliminar</button>
                                             </td>
                                         </tr>
                                       {% endfor %}
@@ -173,7 +155,6 @@
                       <!-- Botones de Acción -->
                       <div class="d-flex justify-content-between">
                           <button type="submit" id="add-animal" class="btn btn-primary">Agregar</button>
-                          <button type="button" id="update-animal" class="btn btn-secondary">Modificar</button>
                           <button type="button" onclick="toggleForm()" class="btn btn-outline-danger">Cancelar</button>
                       </div>
                     </form>
@@ -185,7 +166,6 @@
 
 
     <script>
-
 
 
 <!--    GUARDAR EN LA VISTA LOS CAMBIOS HECHOS EN LA GRILLA-->
@@ -228,11 +208,16 @@
                                 success: function(response) {
                                     console.log('Respuesta exitosa:', response); // Debug
                                     cell.text(newValue);  // Actualiza la celda con el nuevo valor
+
+                                    showPopup('Datos actualizados exitosamente.', 'success');
+
                                 },
                                 error: function(xhr) {
                                     console.log('Error en la solicitud AJAX:', xhr); // Debug
                                     alert('Error al actualizar: ' + xhr.responseText);
                                     cell.text(currentValue); // Restaura el valor original si falla
+                                    showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
+
                                 }
                             });
                         } else {
@@ -280,18 +265,72 @@
                     },
                     success: function(response) {
                         console.log('Actualización exitosa:', response);
+
+                        showPopup('Datos actualizados exitosamente.', 'success');
+
                     },
                     error: function(xhr) {
                         alert('Error al actualizar: ' + xhr.responseText);
                         // Revertir el cambio en caso de error
                         checkbox.prop('checked', !isForSale);
+                        showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
+
                     }
                 });
             });
         });
 
 
+        function confirmDelete(animalId) {
+            // Confirma si el usuario realmente quiere eliminar el registro
+            if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
+                deleteAnimal(animalId);
+            }
+        }
+
+        <!--        -->
+        <!--        ELIMINAR ANIMAL-->
+        <!--        -->
+
+   function deleteAnimal(animalId) {
+            $.ajax({
+                url: `/delete_animal/${animalId}/`,  // Cambia esta URL si es necesario
+                method: 'DELETE',
+                success: function(response) {
+                    if (response.success) {
+                        // Muestra el popup con el mensaje de éxito
+                        showPopup(response.message, 'success');
+
+                        // Actualiza la grilla eliminando la fila correspondiente
+                        $(`#animalTable tr[data-animal-id="${animalId}"]`).remove();
+
+                        // Opcional: Si prefieres recargar la página completa para actualizar
+                        // puedes usar el siguiente código en lugar de eliminar la fila:
+                        // location.reload();
+                    } else {
+                        // Muestra un mensaje de error si la eliminación no fue exitosa
+                        showPopup('Error al eliminar el registro: ' + response.message, 'error');
+                    }
+                },
+                error: function(xhr) {
+                    showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
+                }
+            });
+        }
+
     </script>
+
+
+     {% if messages %}
+        {% for message in messages %}
+            <div class="popup-message {{ message.tags }}">
+                <button class="close-btn" onclick="closePopup(this)">×</button>
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+ <!-- Script para cerrar el pop-up automáticamente -->
 
 {% endblock %}
 

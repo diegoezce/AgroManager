@@ -15,6 +15,40 @@
     <!-- Add jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+     <script>
+         // Función para obtener el token CSRF del cookie
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            // Obtiene el token CSRF
+            const csrfToken = getCookie('csrftoken');
+
+            // Configura el token CSRF para todas las solicitudes AJAX
+            $.ajaxSetup({
+                beforeSend: function(xhr, settings) {
+                    // Solo agrega el token en métodos que modifican datos
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type)) {
+                        xhr.setRequestHeader("X-CSRFToken", csrfToken);
+                    }
+                }
+            });
+     </script>
+
 </head>
 <body>
 
@@ -26,15 +60,75 @@
                 <li><a href="{% url 'main' %}">Inicio</a></li>
                 <li><a href="{% url 'admin_animales' %}">Animales</a></li>
                 <li><a href="{% url 'settings' %}">Configuración</a></li>
+                <li><a href="{% url 'admin_campos' %}">Campos</a></li>
                 <li><a href="{% url 'mapeo' %}">Mapeo</a></li>
                 <li><a href="{% url 'help' %}">Ayuda</a></li>
             </ul>
         </nav>
 
+        <style>
 
-      {% block extra_head %}
+              .editable {
+            cursor: pointer; /* Cambia el cursor para indicar que es editable */
+            border-bottom: 1px dotted #007bff; /* Agrega un subrayado punteado */
+            color: #007bff; /* Cambia el color del texto */
+        }
 
-      {% endblock %}
+        .editable:hover {
+            background-color: #f1f1f1; /* Cambia el color de fondo al pasar el ratón */
+            color: #0056b3; /* Cambia el color del texto al pasar el ratón */
+        }
+
+         .editable i {
+            font-size: 0.75rem;
+            color: #007bff;
+            margin-left: 4px;
+            opacity: 0.7;
+        }
+
+        .editable:hover i {
+            opacity: 1; /* Aumenta la opacidad al pasar el ratón */
+        }
+
+        /* Estilo del contenedor de mensajes */
+        .popup-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4caf50; /* Color de fondo para el éxito */
+            color: white;
+            padding: 15px 30px;
+            border-radius: 5px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 1;
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            transform: translateY(0);
+            z-index: 1000;
+        }
+
+        .popup-message.error { background-color: #f44336; } /* Color de fondo para error */
+
+        .popup-message .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .popup-message.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        </style>
+
+
+        {% block extra_head %}
+
+        {% endblock %}
 
     </header>
 
@@ -49,5 +143,50 @@
     <footer>
         <p>&copy; 2024 Mi Aplicación. Todos los derechos reservados.</p>
     </footer>
+
+    <script>
+        <!--    MOSTRAR POP UP-->
+
+        function showPopup(message, type) {
+            // Crear un nuevo div para el mensaje
+            const popup = document.createElement('div');
+            popup.className = `popup-message ${type}`; // Asigna la clase de tipo (success o error)
+
+            // Agregar el botón de cierre
+            const closeButton = document.createElement('button');
+            closeButton.className = 'close-btn';
+            closeButton.innerHTML = '×';
+            closeButton.onclick = function() {
+                popup.classList.add('hidden'); // Oculta el pop-up al hacer clic
+            };
+
+            // Agregar el mensaje al pop-up
+            popup.appendChild(closeButton);
+            popup.appendChild(document.createTextNode(message));
+
+            // Añadir el pop-up al body
+            document.body.appendChild(popup);
+
+            // Cerrar automáticamente después de 5 segundos
+            setTimeout(function() {
+                popup.classList.add('hidden'); // Aplica la clase de ocultar
+            }, 5000);
+        }
+
+    </script>
+     <script>
+            // Función para cerrar el mensaje manualmente
+            function closePopup(element) {
+                element.parentElement.classList.add('hidden');
+            }
+
+            // Cerrar automáticamente después de 5 segundos
+            setTimeout(function() {
+                const popups = document.querySelectorAll('.popup-message');
+                popups.forEach(popup => {
+                    popup.classList.add('hidden');
+                });
+            }, 5000); // Cambia el tiempo en milisegundos si deseas más o menos tiempo
+        </script>
 </body>
 </html>

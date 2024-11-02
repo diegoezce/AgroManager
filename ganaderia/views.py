@@ -1,12 +1,13 @@
 import json
-
+from django.contrib import messages
+from django.shortcuts import redirect
 from django.shortcuts import render
 import joblib
 import pandas as pd
 from django.views.decorators.csrf import csrf_exempt
 
 from . import utils
-from .models import Animal, Breed, PastureZone
+from .models import Animal, Breed, PastureZone, Campo
 from django.http import JsonResponse
 
 from .utils import cargar_datos_geoespaciales
@@ -52,9 +53,11 @@ def input_growth_data(request):
     razas = ['Hereford', 'Brahman', 'Angus', 'Charolais']
     return render(request, 'prediction_input.html', {'razas': razas})
 
+
 def main_view(request):
 
     return render(request, 'main.html')
+
 
 def admin_animales(request):
     animals_list = Animal.objects.all()
@@ -113,10 +116,15 @@ def create_animal(request):
             animal.pasture_zone = pasture
             animal.is_for_sale = sale
             animal.save()
-            return JsonResponse({'success': True, 'message': 'Datos guardados exitosamente.'})
+            messages.success(request, 'Datos guardados exitosamente.')
+            return redirect('admin_animales')
+
 
         except Exception as e:
-            return JsonResponse({'success': False, 'message': 'Error al guardar los datos.', 'error': str(e)})
+
+            messages.error(request, f'Error al guardar los datos: {e}')
+
+            return redirect('admin_animales')  # Redirige a la misma página en caso de error
 
 
 def update_animal(request, animal_id):
@@ -138,4 +146,19 @@ def update_animal(request, animal_id):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+def delete_animal(request, animal_id):
+    if request.method == 'DELETE':
 
+        try:
+            animal = Animal.objects.get(id=animal_id)
+            animal.delete()
+
+            messages.success(request, 'Animal eliminado correctamente.')
+            return JsonResponse({'success': True, 'message': 'Registro eliminado exitosamente.'})
+
+        except Animal.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
+
+def admin_campos(request):
+    campos_list = Campo.objects.all()
+    return render(request, 'admin_campos.html', {'campos_list': campos_list})
