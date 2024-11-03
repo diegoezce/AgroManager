@@ -162,3 +162,18 @@ def delete_animal(request, animal_id):
 def admin_campos(request):
     campos_list = Campo.objects.all()
     return render(request, 'admin_campos.html', {'campos_list': campos_list})
+
+
+def delete_campo(request, campo_id):
+    if request.method == 'DELETE':
+
+        try:
+
+            campo = Campo.objects.get(id=campo_id)
+            campo.delete()
+
+            messages.success(request, 'Campo eliminado correctamente.')
+            return JsonResponse({'success': True, 'message': 'Registro eliminado exitosamente.'})
+
+        except Animal.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)

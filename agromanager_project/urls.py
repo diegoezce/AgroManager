@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ganaderia.views import (input_growth_data, predict_growth, main_view, mapeo, cargar_geojson_view,
-                             update_animal, admin_animales, create_animal, delete_animal, admin_campos)
+                             update_animal, admin_animales, create_animal, delete_animal, admin_campos, delete_campo)
 
 
 urlpatterns = [
@@ -33,6 +33,7 @@ urlpatterns = [
     path('cargar_geojson_view/', cargar_geojson_view, name='cargar_geojson'),
     path('update_animal/<int:animal_id>/', update_animal, name='update_animal'),
     path('delete_animal/<int:animal_id>/', delete_animal, name='delete_animal'),
+    path('delete_campo/<int:campo_id>/', delete_campo, name='delete_campo'),
     path('admin_campos/', admin_campos, name='admin_campos'),
 
 ]
