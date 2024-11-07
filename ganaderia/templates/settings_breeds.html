@@ -59,9 +59,9 @@ AgroGestion | Settings
                                   <tbody>
                                       <!-- Ejemplo de fila de animal -->
                                       {% for breed in breed_list%}
-                                        <tr data-animal-id="{{ breed.id }}">
-                                            <td class="editable" data-field="identifier">{{ breed.name }} </td>
-                                            <td class="editable" data-field="species">{{ breed.description }}</td>
+                                        <tr data-breed-id="{{ breed.id }}">
+                                            <td class="editable" data-field="name">{{ breed.name }} </td>
+                                            <td class="editable" data-field="description">{{ breed.description }}</td>
                                             <td>
                                                 <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ breed.id }})" >Eliminar</button>
                                             </td>
@@ -103,6 +103,87 @@ AgroGestion | Settings
 
 
         <script>
+
+            <!--    GUARDAR EN LA VISTA LOS CAMBIOS HECHOS EN LA GRILLA-->
+                    $(document).ready(function() {
+                    $('.editable').on('click', function() {
+                        const cell = $(this);
+                        const field = cell.data('field');
+                        const currentValue = cell.text().trim();
+                        const breedId = cell.closest('tr').data('breed-id');
+
+                        // Revisar si ya está en modo edición
+                        if (cell.find('input').length > 0) return;
+
+                        // Crear el campo de entrada dentro de la celda sin borrar el contenido
+                        const input = $('<input>', {
+                            type: 'text',
+                            value: currentValue,
+                            class: 'form-control form-control-sm',
+                            css: {
+                                width: '100%',
+                                border: 'none',
+                                padding: '0',
+                                margin: '0'
+                            },
+                            blur: function() {
+                                const newValue = input.val().trim();
+
+                                // Verificar si el valor ha cambiado
+                                if (newValue && newValue !== currentValue) {
+                                    // Realizar la solicitud AJAX solo si hay un cambio real
+                                    $.ajax({
+                                        url: `../update_breed/${breedId}/`,
+                                        type: 'POST',
+                                        data: {
+                                            id: breedId,
+                                            field: field,
+                                            value: newValue,
+                                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                                        },
+                                        success: function(response) {
+                                            console.log('Respuesta exitosa:', response); // Debug
+                                            cell.text(newValue);  // Actualiza la celda con el nuevo valor
+
+                                            showPopup('Datos actualizados exitosamente.', 'success');
+
+                                        },
+                                        error: function(xhr) {
+                                            console.log('Error en la solicitud AJAX:', xhr); // Debug
+                                            alert('Error al actualizar: ' + xhr.responseText);
+                                            cell.text(currentValue); // Restaura el valor original si falla
+                                            showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
+
+                                        }
+                                    });
+                                } else {
+                                    // Restaurar el valor original si no hay cambios
+                                    cell.text(currentValue);
+                                }
+                            },
+                            keyup: function(e) {
+                                if (e.which === 13) { // Cuando se presiona Enter
+                                    input.blur(); // Dispara el evento blur para guardar
+                                }
+                            }
+                        });
+
+                        // Mantener el valor actual visible y agregar el input al final
+                        cell.empty().append(input);
+                        input.focus().val(currentValue); // Pone el foco y mantiene el valor en el campo de entrada
+
+                        // Cerrar la edición si se hace clic fuera del input
+                        $(document).on('click', function(e) {
+                            if (!$(e.target).closest('.editable').length) {
+                                input.blur();
+                            }
+                        });
+                    });
+                });
+
+
+
+
               function confirmDelete(breedId) {
             // Confirma si el usuario realmente quiere eliminar el registro
             if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
@@ -124,7 +205,7 @@ AgroGestion | Settings
                         showPopup(response.message, 'success');
 
                         // Actualiza la grilla eliminando la fila correspondiente
-                        $(`#animalTable tr[data-animal-id="${breedId}"]`).remove();
+                        $(`#animalTable tr[data-breed-id="${breedId}"]`).remove();
 
                         // Opcional: Si prefieres recargar la página completa para actualizar
                         // puedes usar el siguiente código en lugar de eliminar la fila:

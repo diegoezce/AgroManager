@@ -164,7 +164,6 @@ def admin_campos(request):
     campos_list = Campo.objects.all()
     return render(request, 'admin_campos.html', {'campos_list': campos_list})
 
-
 def delete_campo(request, campo_id):
     if request.method == 'DELETE':
 
@@ -217,6 +216,24 @@ def delete_breed(request, breed_id):
 
         except Breed.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
+
+def update_breed(request, breed_id):
+    if request.method == 'POST':
+        field = request.POST.get('field')
+        value = request.POST.get('value')
+
+        try:
+            breed = Breed.objects.get(id=breed_id)
+            setattr(breed, field, value)
+            print(f'dates: {breed} {breed.name} {breed.description} {breed_id}')
+            breed.save()
+            return JsonResponse({'status': 'success'})
+        except Animal.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Animal no encontrado'}, status=404)
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
 
 def help_view(request):
     return render(request, 'help.html')
