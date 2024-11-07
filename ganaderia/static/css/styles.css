@@ -19,7 +19,6 @@ header h1 {
     font-size: 2rem;
 }
 
-
 nav ul {
     list-style: none;
     padding: 0;
@@ -87,30 +86,24 @@ nav ul li a:hover {
 }
 
 /* Formulario de animales */
-#animal-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 350px;
-    margin: 0 auto;
-    font-size: 0.85rem;
-}
-
-#animal-form label {
-    font-size: 0.8rem;
-    color: #666;
-}
-
+#animal-form select,
 #animal-form input[type="text"],
 #animal-form input[type="number"],
 #animal-form input[type="date"],
 #animal-form input[type="checkbox"] {
-    padding: 8px;
+    padding: 7px;
     font-size: 0.85rem;
-    border: 1px solid #ddd;
+    border: 1px solid #ccc;
     border-radius: 4px;
     background-color: #f9f9f9;
     color: #333;
+}
+
+#animal-form select:focus,
+#animal-form input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
 }
 
 .checkbox-group {
@@ -204,55 +197,120 @@ footer {
 }
 
 /* Botones en la grilla de animales */
-.animal-grid td button {
-    font-size: 0.75rem;      /* Tamaño de fuente reducido */
-    padding: 2px 4px;        /* Padding más pequeño */
-    margin: 0;               /* Sin margen para ahorrar espacio */
-    color: #ffffff;
-    background-color: #35424a;
-    border: none;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-.animal-grid td button:hover {
-    background-color: #2a373e; /* Color de fondo al pasar el cursor */
-}
-
+/* Estilos para los botones en la cuadrícula de animales */
+.animal-grid td button,
 .add-animal-btn {
     font-size: 0.8rem;
     padding: 4px 10px;
     color: #ffffff;
-    background-color: #5cb85c; /* color verde suave */
     border: none;
     border-radius: 4px;
-    transition: background-color 0.3s ease;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Botones en las filas de la cuadrícula de animales */
+.animal-grid td button {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    background-color: #007bff;
+    border: 1px solid #0069d9; /* borde para darle más definición */
+}
+
+.animal-grid td button:hover {
+    background-color: #0056b3; /* Cambio de color en hover */
+    color: #e9ecef; /* Ligero cambio de color del texto en hover */
+}
+
+/* Botón para agregar animal */
+.add-animal-btn {
+    background-color: #28a745; /* Color verde */
+    font-weight: bold; /* Para destacar el botón de agregar */
 }
 
 .add-animal-btn:hover {
-    background-color: #4cae4c; /* verde más oscuro en hover */
-    text-decoration: none;
+    background-color: #218838; /* Cambio de color en hover */
+    color: #e9ecef; /* Ligero cambio de color en hover */
 }
 
 .add-animal-btn:focus {
     outline: none;
-    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.5); /* Efecto de enfoque */
 }
 
+/* Para resaltar el botón en acción */
+.animal-grid td button:active,
+.add-animal-btn:active {
+    transform: scale(0.98); /* Efecto de presionado */
+    background-color: #004085; /* Color más oscuro para efecto de clic */
+}
+
+/* Alertas */
 .alert {
     padding: 15px;
     margin-bottom: 20px;
     border-radius: 4px;
 }
+
 .alert-success {
     color: #155724;
     background-color: #d4edda;
     border: 1px solid #c3e6cb;
 }
+
 .alert-error {
     color: #721c24;
     background-color: #f8d7da;
     border: 1px solid #f5c6cb;
 }
 
+/* Estilos específicos para la página de configuración */
+.settings-page .settings-container {
+    text-align: center;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    margin: 40px auto;
+}
+
+.settings-page h1 {
+    font-size: 1.2rem;
+    color: #35424a;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.settings-page .settings-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.settings-page .settings-list li {
+    margin: 15px 0;
+}
+
+.settings-page .settings-list a {
+    display: block;
+    padding: 14px 20px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #fff;
+    background-color: #35424a;
+    border-radius: 8px;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.3s, transform 0.2s;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.settings-page .settings-list a:hover {
+    background-color: #357ABD;
+    transform: translateY(-2px);
+}
+
+.settings-page .settings-list a:active {
+    background-color: #2b5f93;
+    transform: translateY(1px);
+}

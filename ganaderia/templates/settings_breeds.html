@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+
+AgroGestion | Settings
+
+{% endblock %}
+
+
+{% block extra_head %}
+
+     <script>
+         // FUNCION PARA OCULTAR MOSTRAR BREED FORM
+         // FUNCION PARA OCULTAR MOSTRAR BREED FORM
+         // FUNCION PARA OCULTAR MOSTRAR BREED FORM
+          function toggleForm() {
+              const form = document.getElementById("generic-form");
+              const button = document.getElementById("show-form-button");
+              const lista = document.getElementById("list-generic");
+
+              if (form.style.display === "none") {
+                  form.style.display = "block";
+                  button.style.display = "none";
+                  lista.style.display = "none"
+
+              } else {
+                    if (form.style.display === "block") {
+                        form.style.display = "none";
+                        button.style.display = "block";
+                        lista.style.display = "block"
+                        }
+              }
+          }
+
+
+        </script>
+
+
+{% endblock %}
+
+
+{% block content %}
+ <!-- Lista de Animales -->
+    <section class="panel" id="animals-panel">
+                  <div id="list-generic">
+                          <!-- Botón para Agregar Animal -->
+                  <button id="show-form-button" onclick="toggleForm()" class="add-animal-btn">Agregar Raza</button>
+                      <div class="container mt-4">
+                          <div class="table-responsive">
+                              <table class="table table-striped table-hover align-middle animal-grid" id="animalTable">
+                                  <thead class="table-dark">
+                                      <tr>
+                                          <th>Nombre</th>
+                                          <th>Descripción</th>
+                                          <th>Acciones</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <!-- Ejemplo de fila de animal -->
+                                      {% for breed in breed_list%}
+                                        <tr data-animal-id="{{ breed.id }}">
+                                            <td class="editable" data-field="identifier">{{ breed.name }} </td>
+                                            <td class="editable" data-field="species">{{ breed.description }}</td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ breed.id }})" >Eliminar</button>
+                                            </td>
+                                        </tr>
+                                      {% endfor %}
+                                      <!-- Agrega más filas dinámicamente aquí -->
+                                  </tbody>
+
+                              </table>
+                          </div>
+                      </div>
+                  </div>
+
+
+                 <!-- Formulario de Agregar/Modificar Animal (oculto inicialmente) -->
+                 <form action="{% url 'create_breed' %}" method="post" enctype="multipart/form-data" id="generic-form"
+                       style="display: none; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+                     {% csrf_token %}
+
+                      <!-- Especie -->
+                      <div class="form-group mb-3">
+                          <label for="species" class="form-label">Especie:</label>
+                          <input type="text" id="name" name="name" class="form-control" placeholder="Ej: Hereford" required>
+                      </div>
+
+                     <div class="form-group mb-3">
+                          <label for="species" class="form-label">Especie:</label>
+                          <input type="text" id="description" name="description" class="form-control" placeholder="Ej: La raza Hereford es una raza bovina originaria del condado de Herefordshire, Inglaterra," required>
+                     </div>
+
+                      <!-- Botones de Acción -->
+                      <div class="d-flex justify-content-between">
+                          <button type="submit" id="add-animal" class="btn btn-primary">Agregar</button>
+                          <button type="button" onclick="toggleForm()" class="btn btn-outline-danger">Cancelar</button>
+                      </div>
+                    </form>
+
+    </section>
+
+
+        <script>
+              function confirmDelete(breedId) {
+            // Confirma si el usuario realmente quiere eliminar el registro
+            if (confirm('¿Estás seguro de que quieres eliminar este registro?')) {
+                deleteBreed(breedId);
+            }
+        }
+
+        <!--        -->
+        <!--        ELIMINAR ANIMAL-->
+        <!--        -->
+
+        function deleteBreed(breedId) {
+            $.ajax({
+                url: `/delete_breed/${breedId}/`,  // Cambia esta URL si es necesario
+                method: 'DELETE',
+                success: function(response) {
+                    if (response.success) {
+                        // Muestra el popup con el mensaje de éxito
+                        showPopup(response.message, 'success');
+
+                        // Actualiza la grilla eliminando la fila correspondiente
+                        $(`#animalTable tr[data-animal-id="${breedId}"]`).remove();
+
+                        // Opcional: Si prefieres recargar la página completa para actualizar
+                        // puedes usar el siguiente código en lugar de eliminar la fila:
+                        // location.reload();
+                    } else {
+                        // Muestra un mensaje de error si la eliminación no fue exitosa
+                        showPopup('Error al eliminar el registro: ' + response.message, 'error');
+                    }
+                },
+                error: function(xhr) {
+                    showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
+                }
+            });
+        }
+
+
+        </script>
+         {% if messages %}
+                {% for message in messages %}
+                    <div class="popup-message {{ message.tags }}">
+                        <button class="close-btn" onclick="closePopup(this)">×</button>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+{% endblock %}

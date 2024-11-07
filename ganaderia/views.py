@@ -61,7 +61,8 @@ def main_view(request):
 
 def admin_animales(request):
     animals_list = Animal.objects.all()
-    return render(request, 'admin_animales.html', {'animals_list': animals_list})
+    breeds_list = Breed.objects.all()
+    return render(request, 'admin_animales.html', {'animals_list': animals_list, 'breeds_list': breeds_list})
 
 
 def mapeo(request):
@@ -177,3 +178,49 @@ def delete_campo(request, campo_id):
 
         except Animal.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
+
+def settings_view(request):
+
+    return render(request, 'settings.html')
+
+def settings_breeds(request):
+    breed_list = Breed.objects.all()
+    return render(request, 'settings_breeds.html',{'breed_list': breed_list})
+
+def create_breed(request):
+    if request.method == 'POST':
+        try:
+            breed = Breed()
+            breed.name = request.POST.get('name')
+            breed.description = request.POST.get('description')
+
+            breed.save()
+            messages.success(request, 'Datos guardados exitosamente.')
+            return redirect('settings_breeds')
+
+        except Exception as e:
+
+            messages.error(request, f'Error al guardar los datos: {e}')
+
+            return redirect('settings_breeds')  # Redirige a la misma página en caso de error
+
+def delete_breed(request, breed_id):
+    if request.method == 'DELETE':
+
+        try:
+
+            breed = Breed.objects.get(id=breed_id)
+            breed.delete()
+
+            messages.success(request, 'Raza eliminado correctamente.')
+            return JsonResponse({'success': True, 'message': 'Registro eliminado exitosamente.'})
+
+        except Breed.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
+
+def help_view(request):
+    return render(request, 'help.html')
+
+def settings_pasture(request):
+
+    return render(request, 'settings_pasture.html')

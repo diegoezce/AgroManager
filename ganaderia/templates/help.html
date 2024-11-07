@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+AgroGestión - Ayuda
+{% endblock %}
+
+
+{% block extra_head %}
+        <h1 class="text-center">Centro de Ayuda - AgroGestión</h1>
+        <p class="text-center text-muted">Encuentra respuestas a tus preguntas y aprende a usar AgroGestión</p>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+{% endblock %}
+
+
+{% block content %}
+<!-- Sección de preguntas frecuentes -->
+        <section id="faq" class="mb-5">
+            <h2>Preguntas Frecuentes</h2>
+            <div class="accordion" id="faqAccordion">
+                <!-- Pregunta 1 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading1">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse1" aria-expanded="true" aria-controls="faqCollapse1">
+                            ¿Cómo puedo agregar un nuevo animal?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse1" class="accordion-collapse collapse show" aria-labelledby="faqHeading1" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Para agregar un nuevo animal, ve a la sección "Animales" y haz clic en el botón "Agregar Animal". Completa los detalles solicitados y guarda la información.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 2 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading2">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse2" aria-expanded="false" aria-controls="faqCollapse2">
+                            ¿Cómo configuro las métricas de crecimiento?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse2" class="accordion-collapse collapse" aria-labelledby="faqHeading2" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            En la sección de "Configuración", puedes definir y ajustar las métricas de crecimiento de acuerdo a las necesidades específicas de tu producción.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pregunta 3 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="faqHeading3">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faqCollapse3" aria-expanded="false" aria-controls="faqCollapse3">
+                            ¿Qué hago si necesito ayuda adicional?
+                        </button>
+                    </h2>
+                    <div id="faqCollapse3" class="accordion-collapse collapse" aria-labelledby="faqHeading3" data-bs-parent="#faqAccordion">
+                        <div class="accordion-body">
+                            Puedes comunicarte con nuestro equipo de soporte enviando un correo a <a href="mailto:soporte@agrogestion.com">soporte@agrogestion.com</a>. Estamos aquí para ayudarte.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección de contacto -->
+        <section id="contact" class="mb-5">
+            <h2>Contacto de Soporte</h2>
+            <p>¿No encuentras la respuesta que necesitas? Ponte en contacto con nosotros:</p>
+            <ul>
+                <li>Email: <a href="mailto:soporte@agrogestion.com">soporte@agrogestion.com</a></li>
+                <li>Teléfono: +1 (555) 555-5555</li>
+                <li>Horario: Lunes a Viernes de 9:00 a.m. a 5:00 p.m.</li>
+            </ul>
+        </section>
+
+        <!-- Recursos adicionales -->
+        <section id="resources">
+            <h2>Recursos Adicionales</h2>
+            <ul>
+                <li><a href="#">Videos tutoriales</a> - Aprende a usar AgroGestión paso a paso.</li>
+                <li><a href="#">Manual de usuario</a> - Consulta el manual completo para resolver dudas.</li>
+                <li><a href="#">Foro de la comunidad</a> - Conéctate con otros usuarios y comparte experiencias.</li>
+            </ul>
+        </section>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock %}

@@ -113,13 +113,19 @@
                       <!-- Especie -->
                       <div class="form-group mb-3">
                           <label for="species" class="form-label">Especie:</label>
-                          <input type="text" id="species" name="species" class="form-control" placeholder="Ej: Vaca" required>
+                          <input type="text" id="species" name="species" class="form-control" value="Vaca" placeholder="Ej: Vaca" required>
                       </div>
 
                       <!-- Raza -->
                       <div class="form-group mb-3">
                           <label for="breed" class="form-label">Raza:</label>
-                          <input type="text" id="breed" name="breed" class="form-control" placeholder="Ej: Hereford" required>
+<!--                          <input type="text" id="breed" name="breed" value = "Hereford" placeholder="Ej: Hereford" required>-->
+                           <select id="breed" name="breed" class="form-select"  required>
+                                <option value="">Seleccione una raza</option>
+                                {% for breed in breeds_list %}
+                                    <option value="{{ breed.name }}">{{ breed.name }}</option>
+                                {% endfor %}
+                           </select><br>
                       </div>
 
                       <!-- Fecha de Nacimiento -->

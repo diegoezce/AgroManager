@@ -1,0 +1,30 @@
+{% extends "base.html" %}{% load static %}
+
+
+{% block title %}
+
+AgroGestion | Settings
+
+{% endblock %}
+
+{% block extra_head %}
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="settings-page">
+       <div class="settings-container">
+          <h1>Configuración</h1>
+          <ul class="settings-list">
+          <li><a href="{% url 'settings_breeds' %}">Configurar Razas</a></li>
+          <li><a href="{% url 'admin_campos' %}">Campos</a></li>
+          <li><a href="{% url 'mapeo' %}">Mapeo</a></li>
+          <li><a href="{% url 'settings_pasture' %}">Configurar Zonas de Pastoreo</a></li>
+        </ul>
+       </div>
+    </div>
+
+{% endblock %}
+
+
