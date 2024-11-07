@@ -1,1 +1,1 @@
-web: gunicorn AgroManager.wsgi --log-file -
+web: gunicorn agromanager_project.wsgi --log-file -
