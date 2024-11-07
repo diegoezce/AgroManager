@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-g*f2s*@va$6isvrvt0u)ssng*bh4#*s_xmqo@**!flh=-v#-1p
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['agrogestion-ef1971df93d0.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
 
