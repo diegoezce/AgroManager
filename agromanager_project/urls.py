@@ -19,7 +19,8 @@ from django.contrib import admin
 from django.urls import path
 from ganaderia.views import (input_growth_data, predict_growth, main_view, mapeo, cargar_geojson_view,
                              update_animal, admin_animales, create_animal, delete_animal, admin_campos, delete_campo,
-                             settings_breeds, settings_pasture, settings_view, help_view, create_breed, delete_breed, update_breed)
+                             settings_breeds, settings_pasture, settings_view, help_view, create_breed, delete_breed, 
+                             add_weight_record, update_breed)
 
 
 urlpatterns = [
@@ -27,20 +28,25 @@ urlpatterns = [
     path('predict/', predict_growth, name='predict_growth'),
     path('input/', input_growth_data, name='input_growth_data'),
     path('main/', main_view, name='main'),
-    path('admin_animales/', admin_animales, name='admin_animales'),
-    path('create_animal', create_animal, name='create_animal'),
+    # CONFIGURACION
     path('settings/', settings_view, name='settings'),
     path('mapeo/', mapeo, name='mapeo'),
     path('help/', help_view, name='help'),
     path('cargar_geojson_view/', cargar_geojson_view, name='cargar_geojson'),
+    # ANIMALES
+    path('admin_animales/', admin_animales, name='admin_animales'),
     path('update_animal/<int:animal_id>/', update_animal, name='update_animal'),
     path('delete_animal/<int:animal_id>/', delete_animal, name='delete_animal'),
-    path('delete_campo/<int:campo_id>/', delete_campo, name='delete_campo'),
+    path('create_animal', create_animal, name='create_animal'),
+    path('add_weight_record/<int:animal_id>/', add_weight_record, name='add_weight_record'),
+    # CAMPOS
     path('admin_campos/', admin_campos, name='admin_campos'),
+    path('delete_campo/<int:campo_id>/', delete_campo, name='delete_campo'),
     path('settings_breeds/', settings_breeds, name='settings_breeds'),
     path('settings_pasture/', settings_pasture, name='settings_pasture'),
+    # RAZAS
     path('create_breed/', create_breed, name='create_breed'),
     path('delete_breed/<int:breed_id>/', delete_breed, name='delete_breed'),
-    path('update_breed/<int:breed_id>/', update_breed, name='update_breed')
+    path('update_breed/<int:breed_id>/', update_breed, name='update_breed'),
 
 ]

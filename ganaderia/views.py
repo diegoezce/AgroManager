@@ -5,9 +5,10 @@ from django.shortcuts import render
 import joblib
 import pandas as pd
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
 
 from . import utils
-from .models import Animal, Breed, PastureZone, Campo
+from .models import Animal, Breed, PastureZone, Campo, WeightRecord
 from django.http import JsonResponse
 
 from .utils import cargar_datos_geoespaciales
@@ -146,6 +147,7 @@ def update_animal(request, animal_id):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 def delete_animal(request, animal_id):
     if request.method == 'DELETE':
 
@@ -158,10 +160,34 @@ def delete_animal(request, animal_id):
 
         except Animal.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
+        
+
+def add_weight_record(request, animal_id):
+    if request.method == 'POST':
+        try:
+            
+            animal = Animal.objects.get(id=animal_id)
+            p_weight = request.POST.get('weight')
+            print(f" PESO {request.POST.get('weight')}")
+            weight_date = request.POST.get('weight_date', timezone.now())
+            
+            print(f"animal: {animal_id}, peso: {p_weight}, fecha: {weight_date}" )
+
+            new_weight_record = WeightRecord(animal=animal, weight=p_weight)
+            new_weight_record.date_recorded = weight_date
+            new_weight_record.save()
+
+            messages.success(request, 'Peso agregado correctamente.')
+            return JsonResponse({'success': True, 'message': 'Registro agregado exitosamente.'})
+
+        except Animal.DoesNotExist:
+            return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
+
 
 def admin_campos(request):
     campos_list = Campo.objects.all()
     return render(request, 'admin_campos.html', {'campos_list': campos_list})
+
 
 def delete_campo(request, campo_id):
     if request.method == 'DELETE':
@@ -177,13 +203,16 @@ def delete_campo(request, campo_id):
         except Animal.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
 
+
 def settings_view(request):
 
     return render(request, 'settings.html')
 
+
 def settings_breeds(request):
     breed_list = Breed.objects.all()
     return render(request, 'settings_breeds.html',{'breed_list': breed_list})
+
 
 def create_breed(request):
     if request.method == 'POST':
@@ -202,6 +231,7 @@ def create_breed(request):
 
             return redirect('settings_breeds')  # Redirige a la misma página en caso de error
 
+
 def delete_breed(request, breed_id):
     if request.method == 'DELETE':
 
@@ -215,6 +245,7 @@ def delete_breed(request, breed_id):
 
         except Breed.DoesNotExist:
             return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
+
 
 def update_breed(request, breed_id):
     if request.method == 'POST':
@@ -232,8 +263,10 @@ def update_breed(request, breed_id):
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
+
 def help_view(request):
     return render(request, 'help.html')
+
 
 def settings_pasture(request):
 

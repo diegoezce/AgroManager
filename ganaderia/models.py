@@ -28,6 +28,11 @@ class Animal(models.Model):
         """Devuelve el peso más reciente del animal."""
         latest_record = self.weight_records.order_by('-date_recorded').first()
         return latest_record.weight if latest_record else None
+    
+    def latest_weight_recorded(self):
+        """Devuelve la fecha del peso más reciente del animal."""
+        latest_record = self.weight_records.order_by('-date_recorded').first()
+        return latest_record.date_recorded if latest_record else None
 
 
 class WeightRecord(models.Model):

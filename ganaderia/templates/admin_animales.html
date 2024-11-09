@@ -25,9 +25,29 @@
               }
           }
 
+        //Mustra form para agregar peso
+          function toggleFormPeso(animalId) {
+                const animalIdPESO = animalId
+                document.getElementById("animalId_hidden").value = animalIdPESO
+                const form = document.getElementById("weight-form");
+                const button = document.getElementById("show-form-button");
+                const lista = document.getElementById("list-animales");
 
+                if (form.style.display === "none") {
+                    
+                    form.style.display = "block";
+                    button.style.display = "none";
+                    lista.style.display = "none"
 
-
+                } else {
+                        if (form.style.display === "block") {
+                            $('#weight-form')[0].reset(); // Limpia el formulario
+                            form.style.display = "none";
+                            button.style.display = "block";
+                            lista.style.display = "block"
+                            }
+                }
+          }
 
 
 
@@ -66,6 +86,7 @@
                                           <th>Raza</th>
                                           <th>Fecha de Nacimiento</th>
                                           <th>Peso al nacer (kg)</th>
+                                          <th>Ultimo Peso (kg)</th>
                                           <th>Estado de Salud</th>
                                           <th>Zona de Pastoreo</th>
                                           <th>Para la Venta</th>
@@ -81,6 +102,7 @@
                                             <td data-field="breed">{{ animal.breed }}</td>
                                             <td data-field="birth_date">{{ animal.birth_date }}</td>
                                             <td class="editable" data-field="birth_weight">{{ animal.birth_weight }}</td>
+                                            <td data-field="latest_weight" title="{{animal.latest_weight_recorded}}">{{ animal.latest_weight }}</td>
                                             <td class="editable" data-field="health_status">{{ animal.health_status }}</td>
                                             <td data-field="pasture_zone">{{ animal.pasture_zone }}</td>
                                             <td class="editable" data-field="is_for_sale" data-animal-id="{{ animal.id }}">
@@ -88,7 +110,7 @@
                                             </td>
                                             <td>
                                                 <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ animal.id }})" >Eliminar</button>
-                                                <button class="btn btn-danger btn-sm" onclick="addDeight({{ animal.id }})" >+ Pesada</button>
+                                                <button class="btn btn-danger btn-sm" onclick="toggleFormPeso({{ animal.id }})" >+ Pesada</button>
                                             </td>
                                         </tr>
                                       {% endfor %}
@@ -166,6 +188,33 @@
                       </div>
                     </form>
 
+
+
+                  <!-- Formulario de AGREGAR REGISTRO DE PESO-->
+                  <form action="" method="post" enctype="multipart/form-data" id="weight-form" 
+                        style="display: none; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+                    {% csrf_token %}
+
+                     <!-- Fecha de pesado -->
+                     <div class="form-group mb-3">
+                         <label for="weight-date" class="form-label">Fecha de Pesaje:</label>
+                         <input type="date" id="weight-date" name="weight_date" class="form-control" required>
+                     </div>
+
+                     <!-- Peso (kg) -->
+                     <div class="form-group mb-3">
+                         <label for="weight" class="form-label">Peso (kg):</label>
+                         <input type="number" id="weight_record" name="weight" class="form-control" placeholder="Ej: 350" step="0.01" required>
+                         <input type="hidden" id="animalId_hidden" value="">
+                     </div>
+
+                     <!-- Botones de Acción -->
+                     <div class="d-flex justify-content-between">
+                         <button type="submit" id="add-animal" class="btn btn-primary">Agregar</button>
+                         <button type="button" onclick="toggleFormPeso()" class="btn btn-outline-danger">Cancelar</button>
+                     </div>
+                   </form>
+
             </section>
 
 
@@ -174,8 +223,9 @@
 
     <script>
 
-
-<!--    GUARDAR EN LA VISTA LOS CAMBIOS HECHOS EN LA GRILLA-->
+    //---------------------------------------------------------------------------
+    // <!--    GUARDAR EN LA VISTA LOS CAMBIOS HECHOS EN LA GRILLA-->
+    //---------------------------------------------------------------------------
       $(document).ready(function() {
             $('.editable').on('click', function() {
                 const cell = $(this);
@@ -298,41 +348,14 @@
 
 
 
-        <!--        -->
-        <!--        ELIMINAR ANIMAL-->
-        <!--        -->
+        //---------------------------------------------------------------------------
+        //       ELIMINAR ANIMAL
+        //---------------------------------------------------------------------------
 
-   function deleteAnimal(animalId) {
-            $.ajax({
-                url: `/delete_animal/${animalId}/`,  // Cambia esta URL si es necesario
-                method: 'DELETE',
-                success: function(response) {
-                    if (response.success) {
-                        // Muestra el popup con el mensaje de éxito
-                        showPopup(response.message, 'success');
-
-                        // Actualiza la grilla eliminando la fila correspondiente
-                        $(`#animalTable tr[data-animal-id="${animalId}"]`).remove();
-
-                        // Opcional: Si prefieres recargar la página completa para actualizar
-                        // puedes usar el siguiente código en lugar de eliminar la fila:
-                        // location.reload();
-                    } else {
-                        // Muestra un mensaje de error si la eliminación no fue exitosa
-                        showPopup('Error al eliminar el registro: ' + response.message, 'error');
-                    }
-                },
-                error: function(xhr) {
-                    showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
-                }
-            });
-        }
-
-        // agrega un peso nuevo para el animal
-        function addWeight(animalId){
-            $.ajax({
-                    url: `/record_weight_animal/${animalId}/`,  // Cambia esta URL si es necesario
-                    method: 'POST',
+    function deleteAnimal(animalId) {
+                $.ajax({
+                    url: `/delete_animal/${animalId}/`,  // Cambia esta URL si es necesario
+                    method: 'DELETE',
                     success: function(response) {
                         if (response.success) {
                             // Muestra el popup con el mensaje de éxito
@@ -353,6 +376,52 @@
                         showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
                     }
                 });
+            }
+
+        //---------------------------------------------------------------------------
+        //-----------ADD PESO DEL ANIMAL
+        //---------------------------------------------------------------------------
+        
+        document.getElementById('weight-form').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevenir el envío normal del formulario
+            
+            const animalId = document.getElementById("animalId_hidden").value;            
+            const weight = document.getElementById('weight_record').value;
+            const weightDate = document.getElementById('weight-date').value;
+
+            // Llama a tu función AJAX y pasa los valores del formulario
+            addWeight(animalId, weight, weightDate);
+        });
+
+        function addWeight(animalId, weight, weightDate) {
+            $.ajax({
+                url: `/add_weight_record/${animalId}/`,  // URL en Django para manejar la solicitud
+                method: 'POST',
+                data: {
+                    weight: weight,
+                    weight_date: weightDate
+                  
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showPopup(response.message, 'success');
+                        toggleFormPeso();  // Oculta el formulario después de añadir el peso
+
+                        // Actualiza la celda específica en la grilla con el nuevo peso
+                        const row = $(`#animalTable tr[data-animal-id="${animalId}"]`);
+                        row.find('td[data-field="latest_weight"]').text(`${weight} kg`);
+  
+
+                        // Opcional: Agrega el nuevo registro en la grilla o recarga la página
+                        // updateWeightGrid(animalId, weight, weightDate); // Si tienes una función de actualización
+                    } else {
+                        showPopup('Error: ' + response.message, 'error');
+                    }
+                },
+                error: function(xhr) {
+                    showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
+                }
+            });
         }
 
 
