@@ -112,14 +112,13 @@ def create_animal(request):
 
             animal.breed = breed
             animal.birth_date = request.POST.get('birth_date')
-            animal.weight = request.POST.get('weight')
+            animal.birth_weight = request.POST.get('birth_weight')
             animal.health_status = request.POST.get('health_status')
             animal.pasture_zone = pasture
             animal.is_for_sale = sale
             animal.save()
             messages.success(request, 'Datos guardados exitosamente.')
             return redirect('admin_animales')
-
 
         except Exception as e:
 
@@ -232,8 +231,6 @@ def update_breed(request, breed_id):
             return JsonResponse({'status': 'error', 'message': 'Animal no encontrado'}, status=404)
         except Exception as e:
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
-
-
 
 def help_view(request):
     return render(request, 'help.html')

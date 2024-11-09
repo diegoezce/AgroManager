@@ -65,7 +65,7 @@
                                           <th>Especie</th>
                                           <th>Raza</th>
                                           <th>Fecha de Nacimiento</th>
-                                          <th>Peso (kg)</th>
+                                          <th>Peso al nacer (kg)</th>
                                           <th>Estado de Salud</th>
                                           <th>Zona de Pastoreo</th>
                                           <th>Para la Venta</th>
@@ -80,7 +80,7 @@
                                             <td data-field="species">{{ animal.species }}</td>
                                             <td data-field="breed">{{ animal.breed }}</td>
                                             <td data-field="birth_date">{{ animal.birth_date }}</td>
-                                            <td class="editable" data-field="weight">{{ animal.weight }}</td>
+                                            <td class="editable" data-field="birth_weight">{{ animal.birth_weight }}</td>
                                             <td class="editable" data-field="health_status">{{ animal.health_status }}</td>
                                             <td data-field="pasture_zone">{{ animal.pasture_zone }}</td>
                                             <td class="editable" data-field="is_for_sale" data-animal-id="{{ animal.id }}">
@@ -88,6 +88,7 @@
                                             </td>
                                             <td>
                                                 <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ animal.id }})" >Eliminar</button>
+                                                <button class="btn btn-danger btn-sm" onclick="addDeight({{ animal.id }})" >+ Pesada</button>
                                             </td>
                                         </tr>
                                       {% endfor %}
@@ -294,6 +295,9 @@
             }
         }
 
+
+
+
         <!--        -->
         <!--        ELIMINAR ANIMAL-->
         <!--        -->
@@ -323,6 +327,35 @@
                 }
             });
         }
+
+        // agrega un peso nuevo para el animal
+        function addWeight(animalId){
+            $.ajax({
+                    url: `/record_weight_animal/${animalId}/`,  // Cambia esta URL si es necesario
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            // Muestra el popup con el mensaje de éxito
+                            showPopup(response.message, 'success');
+
+                            // Actualiza la grilla eliminando la fila correspondiente
+                            $(`#animalTable tr[data-animal-id="${animalId}"]`).remove();
+
+                            // Opcional: Si prefieres recargar la página completa para actualizar
+                            // puedes usar el siguiente código en lugar de eliminar la fila:
+                            // location.reload();
+                        } else {
+                            // Muestra un mensaje de error si la eliminación no fue exitosa
+                            showPopup('Error al eliminar el registro: ' + response.message, 'error');
+                        }
+                    },
+                    error: function(xhr) {
+                        showPopup('Error en la solicitud. Por favor, inténtalo de nuevo.', 'error');
+                    }
+                });
+        }
+
+
 
     </script>
 

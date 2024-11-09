@@ -11,11 +11,11 @@ class Breed(models.Model):
 
 
 class Animal(models.Model):
-    identifier = models.CharField(max_length=50, unique=True)  # Ej: código de identificación único
+    identifier = models.CharField(max_length=50, unique=True)  # Código de identificación único
     species = models.CharField(max_length=100)                 # Especie (vaca, toro, etc.)
-    breed = models.ForeignKey(Breed, on_delete=models.SET_NULL, null=True)  # Relación a Breed
+    breed = models.ForeignKey('Breed', on_delete=models.SET_NULL, null=True)  # Relación a Breed
     birth_date = models.DateField()                            # Fecha de nacimiento
-    weight = models.FloatField()                               # Peso en kg
+    birth_weight = models.FloatField(default=0)                          # Peso de nacimiento
     health_status = models.CharField(max_length=100)           # Estado de salud (Ej: "Saludable", "Enfermo")
     pasture_zone = models.ForeignKey('PastureZone', on_delete=models.SET_NULL, null=True)  # Zona de pastoreo actual
     is_for_sale = models.BooleanField(default=False)           # Para marcar animales listos para la venta
@@ -23,6 +23,20 @@ class Animal(models.Model):
 
     def __str__(self):
         return f"{self.identifier} - {self.breed}"
+
+    def latest_weight(self):
+        """Devuelve el peso más reciente del animal."""
+        latest_record = self.weight_records.order_by('-date_recorded').first()
+        return latest_record.weight if latest_record else None
+
+
+class WeightRecord(models.Model):
+    animal = models.ForeignKey(Animal, related_name='weight_records', on_delete=models.CASCADE)  # Relación a Animal
+    weight = models.FloatField()                           # Peso en kg
+    date_recorded = models.DateField(default=timezone.now)  # Fecha del registro de peso
+
+    def __str__(self):
+        return f"{self.animal.identifier} - {self.weight} kg on {self.date_recorded}"
 
 
 # Create your models here.
