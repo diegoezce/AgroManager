@@ -6,6 +6,9 @@ import joblib
 import pandas as pd
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
+from django.utils.timezone import now
+from django.db.models import Count, Avg, F
+from django.db.models import Subquery, OuterRef
 
 from . import utils
 from .models import Animal, Breed, PastureZone, Campo, WeightRecord
@@ -295,19 +298,62 @@ def dashboard_view(request):
             for record in weight_records
         ]
        
+   # Total de animales
+    total_animals = Animal.objects.count()
+
+    # Animales para la venta
+    animals_for_sale = Animal.objects.filter(is_for_sale=True).count()
+
+    # Nacidos este mes
+    born_this_month = Animal.objects.filter(birth_date__month=now().month).count()
+
+    # Promedio de peso al nacer
+    average_birth_weight = Animal.objects.aggregate(Avg('birth_weight'))['birth_weight__avg']
+
+    # Promedio de peso actual (usando weight_records)
+    average_current_weight = Animal.objects.annotate(
+        latest_weight=Subquery(WeightRecord.objects.filter(animal=OuterRef('pk')).order_by('-date_recorded').values('weight')[:1])
+    ).aggregate(Avg('latest_weight'))['latest_weight__avg']
+
+    # Porcentaje de animales saludables
+    total_health_status = Animal.objects.filter(health_status="Saludable").count()
+    healthy_percentage = (total_health_status / total_animals) * 100 if total_animals > 0 else 0
+
+    # Tasa de mortalidad
+    mortality_rate = Animal.objects.filter(health_status="Muerto").count()
+    mortality_rate_percentage = (mortality_rate / total_animals) * 100 if total_animals > 0 else 0
+
+    context = {
+       
+    }
+
     try:
     # Enviar los datos de peso y todos los identifiers de las vacas al template
         context = {
             'weight_data_json': json.dumps(weight_data),  # Para el gráfico
             'animal_selected': animal,
             'animals': Animal.objects.all(),              # Para el dropdown
-            'selected_identifier': identifier             # Para mostrar el ID seleccionado
+            'selected_identifier': identifier,             # Para mostrar el ID seleccionado
+            'total_animals': total_animals,
+            'animals_for_sale': animals_for_sale,
+            'born_this_month': born_this_month,
+            'average_birth_weight': average_birth_weight,
+            'average_current_weight': average_current_weight,
+            'healthy_percentage': healthy_percentage,
+            'mortality_rate': mortality_rate_percentage,
         }
     except:
         context = {
             'weight_data_json': json.dumps(weight_data),  # Para el gráfico         
             'animals': Animal.objects.all(),              # Para el dropdown
-            'selected_identifier': identifier             # Para mostrar el ID seleccionado
+            'selected_identifier': identifier,             # Para mostrar el ID seleccionado
+            'total_animals': total_animals,
+            'animals_for_sale': animals_for_sale,
+            'born_this_month': born_this_month,
+            'average_birth_weight': average_birth_weight,
+            'average_current_weight': average_current_weight,
+            'healthy_percentage': healthy_percentage,
+            'mortality_rate': mortality_rate_percentage,
         }
     return render(request, 'main.html', context)
 
