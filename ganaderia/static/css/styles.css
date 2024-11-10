@@ -315,3 +315,76 @@ footer {
     background-color: #2b5f93;
     transform: translateY(1px);
 }
+
+#animalSelector {
+    padding: 8px 10px;
+    width: 200px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f0f0f0;
+    color: #333;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+#animalSelector:hover {
+    border-color: #bbb;
+    background-color: #e6e6e6;
+}
+
+#animalSelector:focus {
+    border-color: #888;
+    background-color: #fff;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+#animalSelector option {
+    padding: 10px;
+    background-color: #fff;
+    color: #333;
+    font-size: 14px;
+}
+
+#animalInfo {
+    width: 230px;
+    padding: 15px;
+    vertical-align: middle;
+    text-align: left;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
+}
+
+#animalInfo:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transform: translateY(-5px);
+}
+
+h3 {
+    font-size: 1.4em; /* Reducido para condensar el cuadro */
+    color: #333;
+    text-align: center;
+    margin-bottom: 10px; /* Menos espacio debajo del título */
+    font-weight: 600;
+}
+
+#animalInfo p {
+    font-size: 13px; /* Texto un poco más pequeño para ahorrar espacio */
+    line-height: 1.6; /* Espaciado de línea ajustado para mayor compactación */
+    color: #555;
+    margin-bottom: 8px; /* Reducido para que los párrafos queden más juntos */
+}
+
+#animalInfo p:last-child {
+    margin-bottom: 0;
+}
+
+#animalInfo p strong {
+    color: #333;
+    font-weight: 500;
+}

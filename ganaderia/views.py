@@ -1,6 +1,6 @@
 import json
 from django.contrib import messages
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.shortcuts import render
 import joblib
 import pandas as pd
@@ -12,6 +12,7 @@ from .models import Animal, Breed, PastureZone, Campo, WeightRecord
 from django.http import JsonResponse
 
 from .utils import cargar_datos_geoespaciales
+
 
 # Cargar el modelo (esto se puede hacer al inicio o con lazy loading si prefieres)
 model_path = 'ml_models/modelo_crecimiento.pkl'
@@ -271,3 +272,43 @@ def help_view(request):
 def settings_pasture(request):
 
     return render(request, 'settings_pasture.html')
+
+
+def dashboard_view(request):
+    # Obtén el identifier de la vaca del parámetro de solicitud (GET o POST, según cómo lo envíes)
+    identifier = request.GET.get('identifier', None)
+
+    weight_data = []
+
+    # Si hay un identifier válido, obtén los datos de peso para esa vaca
+    if identifier:
+        animal = get_object_or_404(Animal, identifier=identifier)
+        weight_records = WeightRecord.objects.filter(animal=animal).order_by('date_recorded')
+
+        # Llenar weight_data con los registros de peso para esta vaca específica
+        weight_data = [
+            {
+                'date': record.date_recorded.strftime('%Y-%m-%d'),
+                'weight': record.weight
+                
+            }
+            for record in weight_records
+        ]
+       
+    try:
+    # Enviar los datos de peso y todos los identifiers de las vacas al template
+        context = {
+            'weight_data_json': json.dumps(weight_data),  # Para el gráfico
+            'animal_selected': animal,
+            'animals': Animal.objects.all(),              # Para el dropdown
+            'selected_identifier': identifier             # Para mostrar el ID seleccionado
+        }
+    except:
+        context = {
+            'weight_data_json': json.dumps(weight_data),  # Para el gráfico         
+            'animals': Animal.objects.all(),              # Para el dropdown
+            'selected_identifier': identifier             # Para mostrar el ID seleccionado
+        }
+    return render(request, 'main.html', context)
+
+   

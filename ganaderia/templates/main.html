@@ -7,17 +7,21 @@ Inicio
 
 
 {% block extra_head %}
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    #weightChart {
+        width: 50%; /* o un tamaño específico como '600px' */
+        max-width: 500px; /* tamaño máximo */
+        height: 100px; /* altura personalizada */
+    }
+  
+</style>
 {% endblock %}
 
 
 {% block content %}
-   <!-- Panel de Dashboard -->
+         
             <section class="dashboard" id="dashboard-panel">
-                <div class="dashboard-section">
-                    <h3>Sección 1</h3>
-                    <p>Espacio para métricas clave o gráficos.</p>
-                </div>
                 <div class="dashboard-section">
                     <h3>Sección 2</h3>
                     <p>Espacio para métricas clave o gráficos.</p>
@@ -26,5 +30,87 @@ Inicio
                     <h3>Sección 3</h3>
                     <p>Espacio para métricas clave o gráficos.</p>
                 </div>
-            </section>
+                <div class="dashboard-section">
+                    <!-- Dropdown para seleccionar el identifier de la vaca -->
+                    <form method="get" action="{% url 'main' %}">
+                        <label for="identifier">Selecciona una vaca:</label>
+                        <select name="identifier" id="animalSelector" onchange="this.form.submit()">
+                            <option value="">-- Seleccionar --</option>
+                            {% for animal in animals %}
+                                <option value="{{ animal.identifier }}" {% if selected_identifier == animal.identifier %}selected{% endif %}>
+                                    {{ animal.identifier }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </form>
+                    <div style="display: flex; justify-content: center; gap: 20px; align-items: flex-start; margin: 0 auto; max-width: 900px;padding-top: 20px;
+padding-bottom: 20px;">
+                        <!-- Contenedor del gráfico -->
+                         
+                        <div id="weightChartContainer" style="width: 100%; max-width: 450px; height: 300px;">
+                            <canvas id="weightChart"></canvas>
+                        </div>
+                   
+                        <!-- Cuadro de información de la vaca -->
+                        <div id="animalInfo" class="animal-grid" style="width: 230px; padding: 20px; vertical-align: middle; text-align:left; height: auto; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+                            <h3 style="font-size: 1.5em; color: #333; text-align: center; margin-bottom: 15px; font-weight: 600;">Información del Animal</h3>
+                            <div style="font-size: 14px; line-height: 1.8; color: #555;">
+                                <p><strong style="color: #333;">ID:</strong> {{ animal_selected.identifier }}</p>
+                                <p><strong style="color: #333;">Especie:</strong> {{ animal_selected.species }}</p>
+                                <p><strong style="color: #333;">Raza:</strong> {{ animal_selected.breed }}</p>
+                                <p><strong style="color: #333;">F. de Nac.:</strong> {{ animal_selected.birth_date }}</p>
+                                <p><strong style="color: #333;">Peso al Nacer:</strong> {{ animal_selected.birth_weight }} kg</p>
+                                <p><strong style="color: #333;">Salud:</strong> {{ animal_selected.health_status }}</p>
+                                <p><strong style="color: #333;">Zona de Pastoreo:</strong> {{ animal_selected.pasture_zone }}</p>
+                                <p><strong style="color: #333;">Para la Venta:</strong> {{ animal_selected.is_for_sale|yesno:"Sí,No" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section> 
+
+
+            <script>
+                // Verifica si weight_data_json tiene contenido antes de intentar analizarlo
+                let weightData;
+                try {
+                    weightData = JSON.parse('{{ weight_data_json|default:"[]"|safe }}');
+                } catch (error) {
+                    console.error("Error parsing JSON data:", error);
+                    weightData = [];
+                }
+            
+                if (weightData.length > 0) {
+                    const dates = weightData.map(record => record.date);
+                    const weights = weightData.map(record => record.weight);
+            
+                    const ctx = document.getElementById('weightChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: dates,
+                            datasets: [{
+                                label: 'Peso (kg)',
+                                data: weights,
+                                borderColor: 'rgba(75, 192, 192, 1)',
+                                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                                borderWidth: 2,
+                                fill: true
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true
+                                }
+                            }
+                        }
+                    });
+                } else {
+                    document.getElementById('weightChartContainer').innerHTML = "<p>Selecciona una vaca para ver sus registros de peso.</p>";
+                }
+            </script>
+
 {% endblock %}

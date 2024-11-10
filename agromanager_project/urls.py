@@ -20,14 +20,14 @@ from django.urls import path
 from ganaderia.views import (input_growth_data, predict_growth, main_view, mapeo, cargar_geojson_view,
                              update_animal, admin_animales, create_animal, delete_animal, admin_campos, delete_campo,
                              settings_breeds, settings_pasture, settings_view, help_view, create_breed, delete_breed, 
-                             add_weight_record, update_breed)
+                             add_weight_record, update_breed, dashboard_view)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('predict/', predict_growth, name='predict_growth'),
     path('input/', input_growth_data, name='input_growth_data'),
-    path('main/', main_view, name='main'),
+    path('main/', dashboard_view, name='main'),
     # CONFIGURACION
     path('settings/', settings_view, name='settings'),
     path('mapeo/', mapeo, name='mapeo'),
