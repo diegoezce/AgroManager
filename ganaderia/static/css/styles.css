@@ -8,7 +8,7 @@ body {
 }
 
 header {
-    background-color: #35424a;
+    background-color: #445b47;
     padding: 20px;
     color: #ffffff;
     text-align: center;
@@ -17,9 +17,7 @@ header {
 /* Estilos generales de encabezados */
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Helvetica Neue', Arial, sans-serif; /* Fuente limpia y moderna */
-    color: #333; /* Color de texto neutro */
-    margin-top: 0.8em;
-    margin-bottom: 0.5em;
+    
     font-weight: 600; /* Peso medio */
 }
 
@@ -27,7 +25,7 @@ h1, h2, h3, h4, h5, h6 {
 h1 {
     font-size: 2.3em;
     line-height: 1.2;
-    color: #222;
+    color: #9ec8a8;
     border-bottom: 2px solid #ddd;
     padding-bottom: 0.3em;
     margin-bottom: 0.8em;
@@ -179,6 +177,7 @@ nav ul li a:hover {
 }
 
 #animal-form input[type="checkbox"] {
+    background-color: #35424a;
     width: 16px;
     height: 16px;
 }
@@ -214,6 +213,7 @@ nav ul li a:hover {
     gap: 15px;
 }
 
+
 .dashboard-section {
     background-color: #ffffff;
     padding: 15px;
@@ -221,6 +221,7 @@ nav ul li a:hover {
     border-left: 4px solid #a3b1c2;
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
     text-align: center;
+    font-weight: 500;
 }
 
 .dashboard-section h3 {
@@ -231,6 +232,11 @@ nav ul li a:hover {
 
 .dashboard-section p {
     color: #666;
+}
+
+.dashboard_general{
+    font-size: 1.3rem;
+    margin-bottom: 15px;
 }
 
 /* Footer */
@@ -280,23 +286,23 @@ footer {
 .animal-grid td button {
     font-size: 0.75rem;
     padding: 4px 8px;
-    background-color: #007bff;
-    border: 1px solid #0069d9; /* borde para darle más definición */
+    background-color: #445b47;
+    border: 1px solid #28382a; /* borde para darle más definición */
 }
 
 .animal-grid td button:hover {
-    background-color: #0056b3; /* Cambio de color en hover */
+    background-color: #4f6c53; /* Cambio de color en hover */
     color: #e9ecef; /* Ligero cambio de color del texto en hover */
 }
 
 /* Botón para agregar animal */
 .add-animal-btn {
-    background-color: #28a745; /* Color verde */
+    background-color: #445b47; /* Color verde */
     font-weight: bold; /* Para destacar el botón de agregar */
 }
 
 .add-animal-btn:hover {
-    background-color: #218838; /* Cambio de color en hover */
+    background-color: #445b47; /* Cambio de color en hover */
     color: #e9ecef; /* Ligero cambio de color en hover */
 }
 
@@ -309,7 +315,7 @@ footer {
 .animal-grid td button:active,
 .add-animal-btn:active {
     transform: scale(0.98); /* Efecto de presionado */
-    background-color: #004085; /* Color más oscuro para efecto de clic */
+    background-color: #445b47; /* Color más oscuro para efecto de clic */
 }
 
 /* Alertas */
@@ -373,12 +379,12 @@ footer {
 }
 
 .settings-page .settings-list a:hover {
-    background-color: #357ABD;
+    background-color: #445b47;
     transform: translateY(-2px);
 }
 
 .settings-page .settings-list a:active {
-    background-color: #2b5f93;
+    background-color: #445b47;
     transform: translateY(1px);
 }
 
@@ -453,4 +459,29 @@ h3 {
 #animalInfo p strong {
     color: #333;
     font-weight: 500;
+}
+
+/* Cambia el color de fondo y el color del texto del botón */
+.btn-primary {
+    background-color: #35424a; /* Color de fondo personalizado */
+    border-color: #58707e; /* Color del borde */
+    color: #ffffff; /* Color del texto */
+}
+
+/* Cambia el color cuando el botón está en estado hover (al pasar el ratón por encima) */
+.btn-primary:hover {
+    background-color: #35424a; /* Color de fondo en hover */
+    border-color: #58707e;
+}
+
+/* Cambia el color cuando el botón está en estado hover (al pasar el ratón por encima) */
+.btn-outline-danger {
+    background-color: #325d47; /* Color de fondo en hover */
+    border-color: #58707e;
+    color: #ffffff;
+}
+
+
+.editable{
+    background-color: #325d47; /* Color de fondo en hover */
 }

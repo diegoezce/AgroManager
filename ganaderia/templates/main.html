@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base.html" %}{% load static %}
 
 
 {% block title %}
@@ -16,9 +16,9 @@ Inicio
          
 <section class="dashboard" id="dashboard-panel" style="display: flex; justify-content: space-between; gap: 20px; padding: 20px; flex-wrap: wrap; flex-direction: row;">
     <div class="dashboard-section" style="flex: 1; min-width: 300px; max-width: 48%;">
-        <div id="metricsInfo" class="animal-grid" style="padding: 20px; vertical-align: middle; text-align: left; height: auto; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+        <div id="metricsInfo" class="dashboard_general" style="padding: 20px; vertical-align: middle; text-align: left; height: auto; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
             <h3 style="font-size: 1.4em; color: #333; text-align: center; margin-bottom: 10px; font-weight: 600;">Estadísticas</h3>
-            <div style="font-size: 13px; line-height: 1.6; color: #555;">
+            <div >
                 <p><strong style="color: #333;">Total de Animales:</strong> {{ total_animals|floatformat:2 }}</p>
                 <p><strong style="color: #333;">Animales para la Venta:</strong> {{ animals_for_sale|floatformat:2 }}</p>
                 <p><strong style="color: #333;">Nacidos este Mes:</strong> {{ born_this_month|floatformat:2 }}</p>
@@ -33,14 +33,16 @@ Inicio
     <div class="dashboard-section" style="flex: 1; min-width: 450px; max-width: 48%;">
         <!-- Dropdown para seleccionar el identifier de la vaca -->
         <form method="get" action="{% url 'main' %}" style="text-align: center; margin-bottom: 20px;">
-            <label for="identifier" style="font-size: 1.2em; color: #333;">Selecciona una vaca:</label>
-            <select name="identifier" id="animalSelector" onchange="this.form.submit()" style="font-size: 1.1em; padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd; background-color: #f9f9f9;">
+            <label for="identifier" style="font-size: 1.0rem; color: #333;">Selecciona una vaca:</label>
+            <select name="identifier" id="animalSelector" onchange="this.form.submit()" 
+                style="font-size: 0.9rem; padding: 5px 10px; border-radius: 5px; border: 1px solid #ddd; background-color: #f9f9f9;">
                 <option value="">-- Seleccionar --</option>
                 {% for animal in animals %}
                     <option value="{{ animal.identifier }}" {% if selected_identifier == animal.identifier %}selected{% endif %}>
                         {{ animal.identifier }}
                     </option>
                 {% endfor %}
+
             </select>
         </form>
         
@@ -48,6 +50,11 @@ Inicio
             <!-- Contenedor del gráfico -->
             <div id="weightChartContainer" style="flex: 1; width: 100%; max-width: 450px; height: 300px;">
                 <canvas id="weightChart"></canvas>
+            </div>
+            
+            <div id="agrologo">
+                <img src="{% static 'img/AgroLogo.jpg' %}" alt="Logo de AgroGestión" class="logo" 
+                style="height: 150px; margin-right: 10px; border-radius: 20%;">
             </div>
 
             <!-- Cuadro de información de la vaca -->
@@ -107,9 +114,15 @@ Inicio
                             }
                         }
                     });
+                    
+                    // O para ocultar
+                    document.getElementById('agrologo').style.visibility = 'hidden';  // Para ocultar      
+                    weightChart  
                 } else {
-                    document.getElementById('weightChartContainer').innerHTML = "<p>Selecciona una vaca para ver sus registros de peso.</p>";
-                }
+                    document.getElementById('weightChartContainer').innerHTML = "<p>Selecciona una vaca para ver sus registros de peso.</p>" ;
+                    document.getElementById('agrologo').style.visibility = 'visible'; // Para hacer visible
+                            
+                    }
             </script>
 
 {% endblock %}

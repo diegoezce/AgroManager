@@ -109,8 +109,8 @@
                                                 <input type="checkbox" class="sale-checkbox" {% if animal.is_for_sale %}checked{% endif %}>
                                             </td>
                                             <td>
-                                                <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ animal.id }})" >Eliminar</button>
-                                                <button class="btn btn-danger btn-sm" onclick="toggleFormPeso({{ animal.id }})" >+ Pesada</button>
+                                                <button class="btn " onclick="confirmDelete({{ animal.id }})" >Eliminar</button>
+                                                <button class="btn " onclick="toggleFormPeso({{ animal.id }})" >+ Pesada</button>
                                             </td>
                                         </tr>
                                       {% endfor %}
