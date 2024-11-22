@@ -8,13 +8,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.timezone import now
 from django.db.models import Count, Avg, F
+from . import utils
 from django.db.models import Subquery, OuterRef
 
-from . import utils
 from .models import Animal, Breed, PastureZone, Campo, WeightRecord
 from django.http import JsonResponse
-
+from django.core.serializers import serialize
 from .utils import cargar_datos_geoespaciales
+from django.http import JsonResponse
+from .models import Campo
+from django.shortcuts import render, get_object_or_404
+from .models import Campo
 
 
 # Cargar el modelo (esto se puede hacer al inicio o con lazy loading si prefieres)
@@ -94,6 +98,26 @@ def cargar_geojson_view(request):
 
     # Si no es una solicitud POST, simplemente renderiza el formulario
     return render(request, 'cargar_geojson.html')
+
+
+def view_campo(request, campo_id):
+      # Obtener el campo por ID
+    campo = get_object_or_404(Campo, id=campo_id)
+    # Convertir la geometría WKT a GeoJSON
+    geojson = {
+        "type": "Feature",
+        "properties": {
+            "name": campo.name,
+        },
+        "geometry": {
+            "type": "Polygon",
+            "coordinates": [
+                [[float(coord.split()[0]), float(coord.split()[1])] for coord in campo.geometria.replace("POLYGON ((", "").replace("))", "").split(", ")]
+            ]
+        }
+    }
+    # Renderizar la plantilla y pasar la geometría como contexto
+    return render(request, 'view_campo.html', {'campo_geojson': geojson})
 
 
 def create_animal(request):

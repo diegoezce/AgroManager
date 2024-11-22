@@ -41,6 +41,9 @@ Inicio | Mi Aplicación
                                             <td data-field="geometria">{{ campo.geometria }} </td>
                                             <td>
                                                 <button class="btn btn-danger btn-sm" onclick="confirmDelete({{ campo.id }})" >Eliminar</button>
+                                                <a class="btn btn-sm" href="{% url 'view_campo' campo_id=campo.id %}">
+                                                    Ver
+                                                </a>
                                             </td>
                                         </tr>
                                       {% endfor %}
