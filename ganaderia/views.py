@@ -19,6 +19,10 @@ from django.http import JsonResponse
 from .models import Campo
 from django.shortcuts import render, get_object_or_404
 from .models import Campo
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+import csv
+
 
 
 # Cargar el modelo (esto se puede hacer al inicio o con lazy loading si prefieres)
@@ -72,6 +76,39 @@ def admin_animales(request):
     animals_list = Animal.objects.all()
     breeds_list = Breed.objects.all()
     return render(request, 'admin_animales.html', {'animals_list': animals_list, 'breeds_list': breeds_list})
+
+
+def carga_bulk_animales(request):
+    if request.method == 'POST' and request.FILES['file']:
+        file = request.FILES['file']
+        decoded_file = file.read().decode('utf-8').splitlines()
+        reader = csv.DictReader(decoded_file)
+
+        errores = []
+        for row in reader:
+            try:
+                # Ejemplo de validación y creación
+                breed = Breed.objects.get(name=row['breed'])  # Validar que la raza exista
+                pasture_zone = PastureZone.objects.get(name=row['pasture_zone'])  # Validar que la zona exista
+
+                Animal.objects.create(
+                    identifier=row['identifier'],
+                    species=row['species'],
+                    breed=breed,
+                    birth_date=row['birth_date'],
+                    birth_weight=float(row['birth_weight']),
+                    health_status=row['health_status'],
+                    pasture_zone=pasture_zone,
+                    is_for_sale=row.get('is_for_sale', '').lower() == 'true',
+                )
+            except Exception as e:
+                errores.append(f"Error en la fila {row['identifier']}: {str(e)}")
+
+        if errores:
+            return render(request, 'carga_bulk.html', {'errores': errores})
+
+        return HttpResponseRedirect(reverse('admin_animales'))  # Redirige después de cargar
+    return render(request, 'carga_bulk.html')
 
 
 def mapeo(request):

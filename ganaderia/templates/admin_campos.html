@@ -66,7 +66,16 @@ Inicio | Mi Aplicación
             </div>
         {% endfor %}
     {% endif %}
-
+    {% if errores %}
+        <div>
+            <h3>Errores encontrados:</h3>
+            <ul>
+                {% for error in errores %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
 
   <script>
     function confirmDelete(campoId) {

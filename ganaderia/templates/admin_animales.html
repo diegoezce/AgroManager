@@ -73,7 +73,12 @@
 
                   <!-- Botón para Agregar Animal -->
                   <button id="show-form-button" onclick="toggleForm()" class="add-animal-btn">Agregar Animal</button>
-
+                  <form action="{% url 'carga_bulk_animales' %}" method="post" enctype="multipart/form-data" class="add-animal-btn">
+                    {% csrf_token %}
+                    <label for="file">Subir archivo CSV:</label>
+                    <input type="file" id="file" name="file" accept=".csv" required>
+                    <button type="submit">Cargar Animales</button>
+                  </form>
                   <!-- Lista de Animales -->
                   <div id="list-animales">
                       <div class="container mt-4">

@@ -20,7 +20,7 @@ from django.urls import path
 from ganaderia.views import (input_growth_data, predict_growth, main_view, mapeo, cargar_geojson_view,
                              update_animal, admin_animales, create_animal, delete_animal, admin_campos, delete_campo,
                              settings_breeds, settings_pasture, settings_view, help_view, create_breed, delete_breed, 
-                             add_weight_record, update_breed, dashboard_view, view_campo)
+                             add_weight_record, update_breed, dashboard_view, view_campo, carga_bulk_animales)
 
 
 urlpatterns = [
@@ -39,6 +39,8 @@ urlpatterns = [
     path('delete_animal/<int:animal_id>/', delete_animal, name='delete_animal'),
     path('create_animal', create_animal, name='create_animal'),
     path('add_weight_record/<int:animal_id>/', add_weight_record, name='add_weight_record'),
+    path('carga_bulk/', carga_bulk_animales, name='carga_bulk_animales'),
+
     # CAMPOS
     path('admin_campos/', admin_campos, name='admin_campos'),
     path('delete_campo/<int:campo_id>/', delete_campo, name='delete_campo'),
