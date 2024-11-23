@@ -35,6 +35,7 @@ class Animal(models.Model):
         return latest_record.date_recorded if latest_record else None
 
 
+
 class WeightRecord(models.Model):
     animal = models.ForeignKey(Animal, related_name='weight_records', on_delete=models.CASCADE)  # Relación a Animal
     weight = models.FloatField()                           # Peso en kg

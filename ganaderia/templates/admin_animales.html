@@ -10,17 +10,26 @@
               const form = document.getElementById("animal-form");
               const button = document.getElementById("show-form-button");
               const lista = document.getElementById("list-animales");
+              const cargabulk = document.getElementById("cargabulk");
+              const filtros = document.getElementById("filtros");
+              const paginator = document.getElementById("paginator");
 
               if (form.style.display === "none") {
                   form.style.display = "block";
                   button.style.display = "none";
                   lista.style.display = "none"
+                  cargabulk.style.display = "none"
+                  filtros.style.visibility = "hidden"
+                  paginator.style.display = 'none'
 
               } else {
                     if (form.style.display === "block") {
                         form.style.display = "none";
                         button.style.display = "block";
                         lista.style.display = "block"
+                        cargabulk.style.display = "block"
+                        filtros.style.visibility = "visible"
+                        paginator.style.display = 'block'
                         }
               }
           }
@@ -32,12 +41,20 @@
                 const form = document.getElementById("weight-form");
                 const button = document.getElementById("show-form-button");
                 const lista = document.getElementById("list-animales");
+                const filtros = document.getElementById("filtros");
+                const paginator = document.getElementById("paginator");
+                const cargabulk = document.getElementById("cargabulk");
+
 
                 if (form.style.display === "none") {
                     
                     form.style.display = "block";
                     button.style.display = "none";
                     lista.style.display = "none"
+                    filtros.style.visibility = "hidden"
+                    paginator.style.display = 'none'
+                    cargabulk.style.display = "none"
+
 
                 } else {
                         if (form.style.display === "block") {
@@ -45,6 +62,9 @@
                             form.style.display = "none";
                             button.style.display = "block";
                             lista.style.display = "block"
+                            filtros.style.visibility = "visible"
+                            paginator.style.display = 'block'
+                            cargabulk.style.display = "block"
                             }
                 }
           }
@@ -73,12 +93,60 @@
 
                   <!-- Botón para Agregar Animal -->
                   <button id="show-form-button" onclick="toggleForm()" class="add-animal-btn">Agregar Animal</button>
-                  <form action="{% url 'carga_bulk_animales' %}" method="post" enctype="multipart/form-data" class="add-animal-btn">
+                  
+                  <form action="{% url 'carga_bulk_animales' %}" method="post" enctype="multipart/form-data" class="add-animal-btn" id="cargabulk">
                     {% csrf_token %}
                     <label for="file">Subir archivo CSV:</label>
                     <input type="file" id="file" name="file" accept=".csv" required>
                     <button type="submit">Cargar Animales</button>
                   </form>
+
+                  <form method="get" class="row row-cols-lg-auto g-3 align-items-center mb-4" id="filtros">
+                    <!-- Campo para Especie -->
+                    <div class="col-12">
+                        <label for="species" class="form-label mb-0 small">Especie:</label>
+                        <input type="text" id="species" name="species" value="{{ species }}" class="form-control form-control-sm">
+                    </div>
+                
+                    <!-- Dropdown para Raza -->
+                    <div class="col-12">
+                        <label for="breed" class="form-label mb-0 small">Raza:</label>
+                        <select id="breed" name="breed" class="form-select form-select-sm">
+                            <option value="">Seleccione una raza</option>
+                            {% for breed in breeds_list %}
+                                <option value="{{ breed.id }}" {% if breed.id|stringformat:"s" == breed_selected %}selected{% endif %}>
+                                    {{ breed.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                
+                    <!-- Dropdown para Pasture Zone -->
+                    <div class="col-12">
+                        <label for="pasture_zone" class="form-label mb-0 small">Zona de Pastoreo:</label>
+                        <select id="pasture_zone" name="pasture_zone" class="form-select form-select-sm">
+                            <option value="">Seleccione una zona</option>
+                            {% for zone in pasturezones %}
+                                <option value="{{ zone.id }}" {% if zone.id|stringformat:"s" == pasture_zone_selected %}selected{% endif %}>
+                                    {{ zone.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                
+                    <!-- Campo para Estado de Salud -->
+                    <div class="col-12">
+                        <label for="health_status" class="form-label mb-0 small">Estado de Salud:</label>
+                        <input type="text" id="health_status" name="health_status" value="{{ health_status }}" class="form-control form-control-sm">
+                    </div>
+                
+                    <!-- Botones -->
+                    <div class="col-12 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+                        <a href="{% url 'admin_animales' %}" class="btn btn-secondary btn-sm">Limpiar</a>
+                    </div>
+                </form>
+
                   <!-- Lista de Animales -->
                   <div id="list-animales">
                       <div class="container mt-4">
@@ -126,7 +194,35 @@
                           </div>
                       </div>
                   </div>
-
+                  <div class="pagination" id='paginator'>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            {% if page_obj.has_previous %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1">&laquo; Primero</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                </li>
+                            {% endif %}
+                            
+                            <li class="page-item disabled">
+                                <span class="page-link">
+                                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                                </span>
+                            </li>
+                
+                            {% if page_obj.has_next %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+                                </li>
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Último &raquo;</a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                </div>
 
                   <!-- Formulario de Agregar/Modificar Animal (oculto inicialmente) -->
                  <form action="{% url 'create_animal' %}" method="post" enctype="multipart/form-data" id="animal-form" style="display: none; max-width: 500px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
@@ -162,11 +258,11 @@
                           <input type="date" id="birth-date" name="birth_date" class="form-control" required>
                       </div>
 
-                      <!-- Peso (kg) -->
+                      <!-- Peso (kg)
                       <div class="form-group mb-3">
                           <label for="weight" class="form-label">Peso (kg):</label>
                           <input type="number" id="weight" name="weight" class="form-control" placeholder="Ej: 350" step="0.01" required>
-                      </div>
+                      </div> -->
 
                        <!-- Peso (kg) -->
                        <div class="form-group mb-3">

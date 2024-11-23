@@ -22,8 +22,9 @@ from .models import Campo
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 import csv
-
-
+from django.core.paginator import Paginator
+from .models import Animal
+from .filters import AnimalFilter
 
 # Cargar el modelo (esto se puede hacer al inicio o con lazy loading si prefieres)
 model_path = 'ml_models/modelo_crecimiento.pkl'
@@ -73,9 +74,16 @@ def main_view(request):
 
 
 def admin_animales(request):
-    animals_list = Animal.objects.all()
+    animals = Animal.objects.all()
+    animal_filter = AnimalFilter(request.GET, queryset=animals)
+    pasture_zones = PastureZone.objects.all()
+
+    paginator = Paginator(animal_filter.qs, 10)  # Aplica el paginador al queryset filtrado
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     breeds_list = Breed.objects.all()
-    return render(request, 'admin_animales.html', {'animals_list': animals_list, 'breeds_list': breeds_list})
+    return render(request, 'admin_animales.html', {'animals_list': page_obj, 'breeds_list': breeds_list, 'page_obj': page_obj, 'filter': animal_filter, 'pasturezones': pasture_zones})
 
 
 def carga_bulk_animales(request):
