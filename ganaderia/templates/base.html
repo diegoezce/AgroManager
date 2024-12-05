@@ -48,18 +48,22 @@
 </head>
 <body>
     <!-- Encabezado común -->
-    <header>
-        <img src="{% static 'img/AgroLogo.jpg' %}" alt="Logo de AgroGestión" class="logo" style="height: 50px; margin-right: 10px; border-radius: 20%;">
-
-          <h1>AgroGestión</h1>
-        <nav>
-            <ul>
-                <li><a href="{% url 'main' %}">Inicio</a></li>
-                <li><a href="{% url 'admin_animales' %}">Animales</a></li>
-                <li><a href="{% url 'settings' %}">Configuración</a></li>
-                <li><a href="{% url 'help' %}">Ayuda</a></li>
-            </ul>
-        </nav>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-title">
+                <img src="{% static 'img/AgroLogo.jpg' %}" alt="Logo de AgroGestión" class="logo">
+                <h1 class="header-title">AgroGestión</h1>
+            </div>
+            <nav class="header-nav">
+                <ul class="nav-list">
+                    <li><a href="{% url 'main' %}">Inicio</a></li>
+                    <li><a href="{% url 'admin_animales' %}">Animales</a></li>
+                    <li><a href="{% url 'settings' %}">Configuración</a></li>
+                    <li><a href="{% url 'help' %}">Ayuda</a></li>
+                </ul>
+            </nav>
+        </div>
+   
 
         <style>
 

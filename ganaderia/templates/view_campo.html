@@ -14,7 +14,7 @@ AgroGestión - Ver Campo
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
     <style>
         #map {
-            height: 600px;
+            height: 640px;
             width: 100%;
         }
     </style>
@@ -22,7 +22,7 @@ AgroGestión - Ver Campo
 {% endblock %}
 
 {% block content %}
-    <h1>Visualizar Campo</h1>
+    <h2>Campo: {{ campo.name }}</h2>
     <div id="map"></div>
 
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>

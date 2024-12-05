@@ -75,7 +75,7 @@ def main_view(request):
 
 def admin_animales(request):
     animals = Animal.objects.all()
-    animal_filter = AnimalFilter(request.GET, queryset=animals)
+    animal_filter = AnimalFilter(request.GET, queryset=Animal.objects.all())
     pasture_zones = PastureZone.objects.all()
 
     paginator = Paginator(animal_filter.qs, 10)  # Aplica el paginador al queryset filtrado
@@ -162,7 +162,7 @@ def view_campo(request, campo_id):
         }
     }
     # Renderizar la plantilla y pasar la geometría como contexto
-    return render(request, 'view_campo.html', {'campo_geojson': geojson})
+    return render(request, 'view_campo.html', {'campo_geojson': geojson, 'campo': campo})
 
 
 def create_animal(request):
