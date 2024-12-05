@@ -101,7 +101,7 @@
                         <!-- Campo para Especie -->
                         <div class="col-12 filter-item">
                             <label for="species" class="form-label mb-0 small">Especie:</label>
-                            <input type="text" id="species" name="species" value="{{ species }}" class="form-control form-control-sm">
+                            <input type="text" id="species" name="species" value="{{ selected_specie }}" class="form-control form-control-sm">
                         </div>
                     
                         <!-- Dropdown para Raza -->
@@ -110,10 +110,10 @@
                             <select id="breed" name="breed" class="form-select form-select-sm">
                                 <option value="">Seleccione una raza</option>
                                 {% for breed in breeds_list %}
-                                    <option value="{{ breed.id }}" {% if breed.id|stringformat:"s" == breed_selected %}selected{% endif %}>
-                                        {{ breed.name }}
-                                    </option>
-                                {% endfor %}
+                                <option value="{{ breed }}" {% if breed|stringformat:"s" == selected_breed|stringformat:"s" %}selected{% endif %}>
+                                    {{ breed }}
+                                </option>
+                            {% endfor %}
                             </select>
                         </div>
        
@@ -123,7 +123,7 @@
                             <select id="pasture_zone" name="pasture_zone" class="form-select form-select-sm">
                                 <option value="">Seleccione una zona</option>
                                 {% for zone in pasturezones %}
-                                    <option value="{{ zone.id }}" {% if zone.id|stringformat:"s" == pasture_zone_selected %}selected{% endif %}>
+                                    <option value="{{ zone.name }}" {% if zone.name|stringformat:"s" == selected_pasture_zones|stringformat:"s" %}selected{% endif %}>
                                         {{ zone.name }}
                                     </option>
                                 {% endfor %}
@@ -133,7 +133,7 @@
                         <!-- Campo para Estado de Salud -->
                         <div class="col-12 filter-item">
                             <label for="health_status" class="form-label mb-0 small">Estado de Salud:</label>
-                            <input type="text" id="health_status" name="health_status" value="{{ health_status }}" class="form-control form-control-sm">
+                            <input type="text" id="health_status" name="health_status" value="{{ selected_health}}" class="form-control form-control-sm">
                         </div>
                     
                         <!-- Botones -->

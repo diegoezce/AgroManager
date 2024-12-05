@@ -76,14 +76,31 @@ def main_view(request):
 def admin_animales(request):
     animals = Animal.objects.all()
     animal_filter = AnimalFilter(request.GET, queryset=Animal.objects.all())
+    
+    #retain the values of the filters
+    breedFilter = request.GET.get('breed', '')
+    healthFilter = request.GET.get('health_status','')
+    pasture_zonesFilter = request.GET.get('pasture_zone','')
+    speciesFilter = request.GET.get('species','')
+
+
     pasture_zones = PastureZone.objects.all()
 
     paginator = Paginator(animal_filter.qs, 10)  # Aplica el paginador al queryset filtrado
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-
     breeds_list = Breed.objects.all()
-    return render(request, 'admin_animales.html', {'animals_list': page_obj, 'breeds_list': breeds_list, 'page_obj': page_obj, 'filter': animal_filter, 'pasturezones': pasture_zones})
+    print(request.GET)
+    return render(request, 'admin_animales.html',
+                   {'selected_breed': breedFilter,
+                    'selected_specie': speciesFilter,
+                    'selected_pasture_zones': pasture_zonesFilter,
+                    'selected_health': healthFilter,
+                     'animals_list': page_obj,
+                       'breeds_list': breeds_list,
+                         'page_obj': page_obj,
+                           'filter': animal_filter,
+                             'pasturezones': pasture_zones})
 
 
 def carga_bulk_animales(request):
