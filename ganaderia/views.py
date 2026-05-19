@@ -1,34 +1,43 @@
+"""
+Views for animal management application.
+Handles animal CRUD, weight tracking, breeds, pasture zones, and geospatial mapping.
+"""
+
+import csv
 import json
-from django.contrib import messages
-from django.shortcuts import redirect, get_object_or_404
-from django.shortcuts import render
+import logging
+from io import StringIO
+
 import joblib
 import pandas as pd
-from django.views.decorators.csrf import csrf_exempt
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Count, Avg, F, Subquery, OuterRef, Q
+from django.http import JsonResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render, get_object_or_404
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.timezone import now
-from django.db.models import Count, Avg, F
+from django.views.decorators.csrf import csrf_exempt
+
 from . import utils
-from django.db.models import Subquery, OuterRef
-
-from .models import Animal, Breed, PastureZone, Campo, WeightRecord
-from django.http import JsonResponse
-from django.core.serializers import serialize
-from .utils import cargar_datos_geoespaciales
-from django.http import JsonResponse
-from .models import Campo
-from django.shortcuts import render, get_object_or_404
-from .models import Campo
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-import csv
-from django.core.paginator import Paginator
-from .models import Animal
 from .filters import AnimalFilter
+from .forms import (
+    AnimalForm, BreedForm, WeightRecordForm,
+    PastureZoneForm, HealthRecordForm, BulkAnimalImportForm
+)
+from .models import Animal, Breed, PastureZone, Campo, WeightRecord
+from .utils import cargar_datos_geoespaciales
 
-# Cargar el modelo (esto se puede hacer al inicio o con lazy loading si prefieres)
-model_path = 'ml_models/modelo_crecimiento.pkl'
-pipeline = joblib.load(model_path)  # Asegúrate de usar la ruta correcta
+logger = logging.getLogger(__name__)
+
+# Load ML model
+try:
+    model_path = 'ml_models/modelo_crecimiento.pkl'
+    pipeline = joblib.load(model_path)
+except FileNotFoundError:
+    logger.error(f"ML model not found at {model_path}")
+    pipeline = None
 
 
 def predict_growth(request):
@@ -74,66 +83,105 @@ def main_view(request):
 
 
 def admin_animales(request):
-    animals = Animal.objects.all()
+    """List all animals with filters and pagination."""
     animal_filter = AnimalFilter(request.GET, queryset=Animal.objects.all())
-    
-    #retain the values of the filters
-    breedFilter = request.GET.get('breed', '')
-    healthFilter = request.GET.get('health_status','')
-    pasture_zonesFilter = request.GET.get('pasture_zone','')
-    speciesFilter = request.GET.get('species','')
-
-
     pasture_zones = PastureZone.objects.all()
+    breeds_list = Breed.objects.all()
 
-    paginator = Paginator(animal_filter.qs, 10)  # Aplica el paginador al queryset filtrado
+    paginator = Paginator(animal_filter.qs, 10)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    breeds_list = Breed.objects.all()
-    print(request.GET)
-    return render(request, 'admin_animales.html',
-                   {'selected_breed': breedFilter,
-                    'selected_specie': speciesFilter,
-                    'selected_pasture_zones': pasture_zonesFilter,
-                    'selected_health': healthFilter,
-                     'animals_list': page_obj,
-                       'breeds_list': breeds_list,
-                         'page_obj': page_obj,
-                           'filter': animal_filter,
-                             'pasturezones': pasture_zones})
+
+    context = {
+        'selected_breed': request.GET.get('breed', ''),
+        'selected_specie': request.GET.get('species', ''),
+        'selected_pasture_zones': request.GET.get('pasture_zone', ''),
+        'selected_health': request.GET.get('health_status', ''),
+        'animals_list': page_obj,
+        'breeds_list': breeds_list,
+        'page_obj': page_obj,
+        'filter': animal_filter,
+        'pasturezones': pasture_zones,
+    }
+    return render(request, 'admin_animales.html', context)
 
 
 def carga_bulk_animales(request):
-    if request.method == 'POST' and request.FILES['file']:
-        file = request.FILES['file']
-        decoded_file = file.read().decode('utf-8').splitlines()
-        reader = csv.DictReader(decoded_file)
-
-        errores = []
-        for row in reader:
+    """Import multiple animals from CSV file with validation."""
+    if request.method == 'POST':
+        form = BulkAnimalImportForm(request.POST, request.FILES)
+        if form.is_valid():
             try:
-                # Ejemplo de validación y creación
-                breed = Breed.objects.get(name=row['breed'])  # Validar que la raza exista
-                pasture_zone = PastureZone.objects.get(name=row['pasture_zone'])  # Validar que la zona exista
+                file = form.cleaned_data['file']
+                decoded_file = file.read().decode('utf-8')
+                reader = csv.DictReader(StringIO(decoded_file))
 
-                Animal.objects.create(
-                    identifier=row['identifier'],
-                    species=row['species'],
-                    breed=breed,
-                    birth_date=row['birth_date'],
-                    birth_weight=float(row['birth_weight']),
-                    health_status=row['health_status'],
-                    pasture_zone=pasture_zone,
-                    is_for_sale=row.get('is_for_sale', '').lower() == 'true',
-                )
+                if not reader.fieldnames:
+                    messages.error(request, "CSV file is empty")
+                    return render(request, 'carga_bulk.html', {'form': form})
+
+                # Validate required columns
+                required_fields = {
+                    'identifier', 'species', 'breed',
+                    'birth_date', 'birth_weight', 'health_status'
+                }
+                missing_fields = required_fields - set(reader.fieldnames or [])
+                if missing_fields:
+                    messages.error(
+                        request,
+                        f"Missing columns: {', '.join(missing_fields)}"
+                    )
+                    return render(request, 'carga_bulk.html', {'form': form})
+
+                errores = []
+                creados = 0
+
+                for idx, row in enumerate(reader, 1):
+                    try:
+                        breed, _ = Breed.objects.get_or_create(name=row['breed'].strip())
+                        pasture, _ = PastureZone.objects.get_or_create(
+                            name=row.get('pasture_zone', 'Default').strip()
+                        )
+
+                        animal = Animal.objects.create(
+                            identifier=row['identifier'].strip(),
+                            species=row['species'].strip(),
+                            breed=breed,
+                            birth_date=row['birth_date'],
+                            birth_weight=float(row['birth_weight']),
+                            health_status=row['health_status'].strip(),
+                            pasture_zone=pasture,
+                            is_for_sale=row.get('is_for_sale', 'false').lower() == 'true',
+                        )
+                        creados += 1
+                        logger.info(f"Animal created from CSV: {animal.identifier}")
+
+                    except Exception as e:
+                        error_msg = f"Row {idx} ({row.get('identifier', 'no-id')}): {str(e)}"
+                        errores.append(error_msg)
+                        logger.error(error_msg)
+
+                if creados > 0:
+                    messages.success(request, f"✓ {creados} animal(s) imported successfully")
+
+                if errores:
+                    messages.warning(request, f"⚠ {len(errores)} row(s) with errors")
+                    return render(request, 'carga_bulk.html', {
+                        'form': form,
+                        'errores': errores,
+                        'creados': creados
+                    })
+
+                return redirect('admin_animales')
+
             except Exception as e:
-                errores.append(f"Error en la fila {row['identifier']}: {str(e)}")
+                logger.error(f"Error processing CSV file: {str(e)}")
+                messages.error(request, f"Error processing file: {str(e)}")
+                return render(request, 'carga_bulk.html', {'form': form})
+    else:
+        form = BulkAnimalImportForm()
 
-        if errores:
-            return render(request, 'carga_bulk.html', {'errores': errores})
-
-        return HttpResponseRedirect(reverse('admin_animales'))  # Redirige después de cargar
-    return render(request, 'carga_bulk.html')
+    return render(request, 'carga_bulk.html', {'form': form})
 
 
 def mapeo(request):
@@ -183,39 +231,23 @@ def view_campo(request, campo_id):
 
 
 def create_animal(request):
+    """Create a new animal with validated form."""
     if request.method == 'POST':
-        # Suponiendo que 'animal' es el objeto al que quieres asignar los valores.
-        try:
-            animal = Animal()
-            animal.identifier = request.POST.get('identifier')
-            animal.species = request.POST.get('species')
-
-            breed_name = request.POST.get('breed')
-            breed, created = Breed.objects.get_or_create(name=breed_name)
-
-            pasture_name = request.POST.get('pasture_zone')
-            pasture, pasture_created = PastureZone.objects.get_or_create(name=pasture_name)
-
-            if request.POST.get('is_for_sale') == '':
-                sale = False
-            else:
-                sale = True
-
-            animal.breed = breed
-            animal.birth_date = request.POST.get('birth_date')
-            animal.birth_weight = request.POST.get('birth_weight')
-            animal.health_status = request.POST.get('health_status')
-            animal.pasture_zone = pasture
-            animal.is_for_sale = sale
-            animal.save()
-            messages.success(request, 'Datos guardados exitosamente.')
+        form = AnimalForm(request.POST)
+        if form.is_valid():
+            animal = form.save()
+            messages.success(request, f'Animal "{animal.identifier}" created successfully')
+            logger.info(f"Animal created: {animal.identifier} by user {request.user}")
             return redirect('admin_animales')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+            logger.warning(f"Animal form validation failed: {form.errors}")
+    else:
+        form = AnimalForm()
 
-        except Exception as e:
-
-            messages.error(request, f'Error al guardar los datos: {e}')
-
-            return redirect('admin_animales')  # Redirige a la misma página en caso de error
+    return render(request, 'animal_form.html', {'form': form, 'title': 'Create Animal'})
 
 
 def update_animal(request, animal_id):
@@ -253,25 +285,30 @@ def delete_animal(request, animal_id):
         
 
 def add_weight_record(request, animal_id):
+    """Add a weight record for an animal with validation."""
+    animal = get_object_or_404(Animal, id=animal_id)
+
     if request.method == 'POST':
-        try:
-            
-            animal = Animal.objects.get(id=animal_id)
-            p_weight = request.POST.get('weight')
-            print(f" PESO {request.POST.get('weight')}")
-            weight_date = request.POST.get('weight_date', timezone.now())
-            
-            print(f"animal: {animal_id}, peso: {p_weight}, fecha: {weight_date}" )
+        form = WeightRecordForm(request.POST)
+        if form.is_valid():
+            record = form.save(commit=False)
+            record.animal = animal
+            record.save()
+            messages.success(request, f'Weight recorded: {record.weight}kg on {record.date_recorded}')
+            logger.info(f"Weight record added for {animal.identifier}: {record.weight}kg")
+            return redirect('admin_animales')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = WeightRecordForm()
 
-            new_weight_record = WeightRecord(animal=animal, weight=p_weight)
-            new_weight_record.date_recorded = weight_date
-            new_weight_record.save()
-
-            messages.success(request, 'Peso agregado correctamente.')
-            return JsonResponse({'success': True, 'message': 'Registro agregado exitosamente.'})
-
-        except Animal.DoesNotExist:
-            return JsonResponse({'success': False, 'message': 'Registro no encontrado.'}, status=404)
+    return render(request, 'weight_record_form.html', {
+        'form': form,
+        'animal': animal,
+        'title': f'Add Weight Record for {animal.identifier}'
+    })
 
 
 def admin_campos(request):
@@ -305,21 +342,22 @@ def settings_breeds(request):
 
 
 def create_breed(request):
+    """Create a new breed with validation."""
     if request.method == 'POST':
-        try:
-            breed = Breed()
-            breed.name = request.POST.get('name')
-            breed.description = request.POST.get('description')
-
-            breed.save()
-            messages.success(request, 'Datos guardados exitosamente.')
+        form = BreedForm(request.POST)
+        if form.is_valid():
+            breed = form.save()
+            messages.success(request, f'Breed "{breed.name}" created successfully')
+            logger.info(f"Breed created: {breed.name}")
             return redirect('settings_breeds')
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
+    else:
+        form = BreedForm()
 
-        except Exception as e:
-
-            messages.error(request, f'Error al guardar los datos: {e}')
-
-            return redirect('settings_breeds')  # Redirige a la misma página en caso de error
+    return render(request, 'breed_form.html', {'form': form, 'title': 'Create Breed'})
 
 
 def delete_breed(request, breed_id):
@@ -338,20 +376,24 @@ def delete_breed(request, breed_id):
 
 
 def update_breed(request, breed_id):
+    """Update a breed field via AJAX."""
+    breed = get_object_or_404(Breed, id=breed_id)
+
     if request.method == 'POST':
         field = request.POST.get('field')
         value = request.POST.get('value')
 
         try:
-            breed = Breed.objects.get(id=breed_id)
             setattr(breed, field, value)
-            print(f'dates: {breed} {breed.name} {breed.description} {breed_id}')
+            breed.full_clean()  # Validate before saving
             breed.save()
+            logger.info(f"Breed updated: {breed.name}")
             return JsonResponse({'status': 'success'})
-        except Animal.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Animal no encontrado'}, status=404)
         except Exception as e:
+            logger.error(f"Error updating breed {breed_id}: {str(e)}")
             return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+    return JsonResponse({'status': 'error', 'message': 'Only POST allowed'}, status=405)
 
 
 def help_view(request):

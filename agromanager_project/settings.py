@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,13 +20,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g*f2s*@va$6isvrvt0u)ssng*bh4#*s_xmqo@**!flh=-v#-1p'
+# SECURITY: Load sensitive settings from environment variables
+SECRET_KEY = config(
+    'SECRET_KEY',
+    default='django-insecure-dev-key-change-in-production'
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# SECURITY: DEBUG should be False in production
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['agrogestion-ef1971df93d0.herokuapp.com', '127.0.0.1']
+# SECURITY: Define allowed hosts from environment or use defaults
+ALLOWED_HOSTS = config(
+    'ALLOWED_HOSTS',
+    default='127.0.0.1,localhost',
+    cast=lambda v: [s.strip() for s in v.split(',')]
+)
 
 # Application definition
 
